@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status as rest_status
 from wx_client import serializers
 import uuid
-from rest_framework_jwt.serializers import jwt_encode_handler, jwt_payload_handler
+from utils import JWTHandler
 from wx_api import WxAPIAccess
 from teaching_helper import glog
 import encryption
@@ -48,10 +48,10 @@ class UserRegister(APIView):
         encrypted_code = encryption.sha256(openid)
         u_uuid = uuid.uuid4().hex
         _logger.info('UserRegister -> `encrypted_code`: {}'.format(encrypted_code))
-        user = models.UserProfile.objects.filter(encrypted_code=encrypted_code)
+        user = models.UserProfile.objects.filter(encrypted_code=encrypted_code).first()
 
         # 用户是第一次登陆
-        if not user.exists():
+        if not user:
             user_info.update({'encrypted_code': encrypted_code, 'u_uuid': u_uuid})
             serializer = serializers.UserProfileSerializer(data=user_info)
             if not serializer.is_valid(True):
@@ -60,13 +60,10 @@ class UserRegister(APIView):
             user = models.UserProfile.objects.create(**serializer.data)
             _logger.info('create user `<UserProfile:{}>` successfully...'.format(user.nickName))
 
-        else:
-
-            # 签发JWToken
-            payload = jwt_payload_handler(user)
-            token = jwt_encode_handler(payload)
-            return Response(token)
-
+        # 签发JWToken
+        payload = JWTHandler.jwt_payload_handler(user)
+        token = JWTHandler.jwt_encode_handler(payload)
+        return Response({'r': 0, 'data': token})
 
 
 class UserInfoView(APIView):
@@ -85,3 +82,16 @@ class UserInfoView(APIView):
 
     def delete(self, request, *args, **kwargs):
         pass
+
+
+class FaceProxy(APIView):
+    """ storage encrypted face-img date which be from WeChat in server
+    """
+
+    def post(self, request, **_):
+        raw_data = request.data.get('base64_data', '')
+        if not raw_data:
+            return Response({'r': 1, 'errmsg': '人像数据效验失败...'})
+
+        print(raw_data)
+        return Response({'r': 0, 'errmsg': '人脸录入成功'})

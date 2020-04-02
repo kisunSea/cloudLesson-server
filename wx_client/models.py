@@ -13,7 +13,7 @@ class UserProfile(AbstractUser):
     # unique identification
     u_uuid = models.UUIDField(max_length=36, null=True)
     gender = models.IntegerField(choices=gdata.GENDER_CHOICES, default=gdata.UNKNOWN)
-    username = models.CharField(max_length=32, default='')
+    nickName = models.CharField(max_length=32, default='')
     country = models.CharField(max_length=32, default='')
     province = models.CharField(max_length=32, null=True, blank=True, default='')
     city = models.CharField(max_length=32, null=True, blank=True, default='')
@@ -37,6 +37,10 @@ class UserProfile(AbstractUser):
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
+
+    # @property
+    # def username(self):
+    #     return self.u_uuid
 
 
 class FeatureForSignIn(models.Model):

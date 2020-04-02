@@ -5,6 +5,9 @@ app_name = 'wx_client'
 
 urlpatterns = [
 
+    # POST face feature record
+    url(r'^face_feature/record$', views.FaceProxy.as_view()),
+
     # POST    register an user
     url(r'^$', views.UserRegister.as_view(), name='register'),
 
