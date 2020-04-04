@@ -1,6 +1,7 @@
 import jwt
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
+from wx_client import models
 
 from teaching_helper import gdata
 from utils import JWTHandler
@@ -19,8 +20,6 @@ class JWTVerificationSerializer(serializers.Serializer):
 
         payload = self._check_payload(token=token)
         user = self._check_user(payload=payload)
-
-        print(payload, token)
 
         return {
             'token': token,
@@ -63,6 +62,12 @@ class JWTVerificationSerializer(serializers.Serializer):
 
         return user
 
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
 
 class UserProfileSerializer(serializers.Serializer):
 
@@ -83,5 +88,21 @@ class UserProfileSerializer(serializers.Serializer):
     # rss_method just supports email up to now
     rss_method = serializers.ChoiceField(choices=gdata.RSS_CHOICES, default=gdata.UNBIND_RSS, required=False)
 
-    def validate(self, attrs):
+    def update(self, instance, validated_data):
         pass
+
+    def create(self, validated_data):
+        pass
+
+
+class FeatureForSignInSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.FeatureForSignIn
+        fields = ('face_token', 'base64_face')
+
+    def update(self, instance, validated_data):
+        super(FeatureForSignInSerializer, self).update(instance, validated_data)
+
+    def create(self, validated_data):
+        super(FeatureForSignInSerializer, self).create(validated_data)

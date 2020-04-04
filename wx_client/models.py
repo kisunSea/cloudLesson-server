@@ -46,8 +46,9 @@ class UserProfile(AbstractUser):
 class FeatureForSignIn(models.Model):
     """this Model class will save data which used in signing
     """
-    face_token = models.CharField(verbose_name='人脸特征密文', max_length=256, unique=True)
-
+    user = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    face_token = models.CharField(verbose_name='人脸特征密文', max_length=132, unique=True)
+    base64_face = models.TextField(max_length=10000)
     # the mac of BlueTooth is not unique
     blue_tooth_mac = models.CharField(verbose_name='蓝牙Mac地址', max_length=64)
     record_time = models.DateTimeField(verbose_name='记录时间', auto_now_add=True)
