@@ -11,7 +11,9 @@ class JWTokenAuth(BaseAuthentication):
     """
 
     def authenticate(self, request):
-        token = request.data.get('token', '')
+        token = request.data.get('token')
+        if not token:
+            token = request.query_params.get('token')
         valid_data = serializers.JWTVerificationSerializer().validate({'token': token})
 
         user = valid_data['user']

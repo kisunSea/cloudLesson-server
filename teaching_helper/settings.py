@@ -27,7 +27,7 @@ SECRET_KEY = ')d5u8tcmc*i^y7_j@c+79f!t3+!h=0ug$$n@7&h#+tf(6s&#wz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['134.175.27.71',]
 
 # Application definition
 
@@ -125,6 +125,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# ----------------------------------------
 # restful configuration
 
 REST_FRAMEWORK = {
@@ -148,3 +149,11 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_PAYLOAD_HANDLER': utils.JWTHandler.jwt_payload_handler,
 }
+
+# ---------------------------------
+# FastDFS configuration
+
+DEFAULT_FILE_STORAGE = 'fdfs_storage.FastDFSStorage'
+
+FDFS_URL = 'http://134.175.27.71/'
+FDFS_CLIENT_CONF = r'/etc/fdfs/client.conf'

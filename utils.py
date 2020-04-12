@@ -1,12 +1,12 @@
-import uuid
-from calendar import timegm
 import datetime
+import threading
 
 import jwt
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from MyQR import myqr
 
 from teaching_helper import glog
+from teaching_helper import gdata
 
 _logger = glog.get_logger(__name__)
 
@@ -15,7 +15,6 @@ _logger = glog.get_logger(__name__)
 
 
 def jwt_get_secret_key(_):
-
     return settings.SECRET_KEY
 
 
@@ -68,3 +67,31 @@ class JWTHandler(object):
         }
 
         return payload
+
+
+class QRCodeHelper(object):
+    """生成二维码
+    """
+
+    lock =threading.Lock()
+
+    @staticmethod
+    def qr_code_helper():
+        with QRCodeHelper.lock:
+            if not hasattr(QRCodeHelper, 'ins'):
+                setattr(QRCodeHelper, 'ins', QRCodeHelper())
+            return getattr(QRCodeHelper, 'ins')
+
+    def generate_lesson_qr_code(self, code):
+        """生成二维码
+        """
+        self.is_successful = True
+        try:
+            assert isinstance(code, str), '无法生成班课码，无效的类型'
+            myqr.run(words=code,
+                     version=9,
+                     save_name= '{}.png'.format(code),
+                     save_dir=gdata.LESSON_QR_CODE_PATH)
+        except (AssertionError, Exception) as e:
+            _logger.warning('generate_lesson_qr_code, error:{}'.format(e), exc_info=True)
+            self.is_successful = False
