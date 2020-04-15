@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 
 import encryption
 import model_access as mc
@@ -15,6 +16,7 @@ import utils
 from wx_api import WxAPIAccess
 from wx_client import models
 from wx_client import serializers
+from fdfs_storage import fc
 
 _logger = glog.get_logger(__name__)
 
@@ -63,7 +65,7 @@ class UserRegister(HandleAPIView):
         u_uuid = uuid.uuid4()
         user = mc.QueryUserProfileHelper.query_user_by_encrypted_code(encrypted_code)
 
-        # 用户是第一次登陆
+        # 用户首次登陆
         if not user:
             user_info.update({'encrypted_code': encrypted_code, 'u_uuid': u_uuid})
             _logger.debug('user_info:\t{}'.format(user_info))
@@ -164,8 +166,10 @@ class LessonView(HandleAPIView):
         """
         try:
             user = request.user
-            teaching_lessons = self.info_serializer(user.teaching_lessons.order_by('-create_time'), many=True).data
-            listening_lessons = self.info_serializer(user.listening_lessons.order_by('-create_time'), many=True).data
+            teaching_lessons = self.info_serializer(user.teaching_lessons.order_by('-create_time').all(),
+                                                    many=True).data
+            listening_lessons = self.info_serializer(user.listening_lessons.order_by('-create_time').all(),
+                                                     many=True).data
         except Exception as e:
             _logger.warn('failed to get information of lessons, error:{}'.format(e), exc_info=True)
             return Response({'r': 1, 'errmsg': '查询班课失败'})
@@ -195,13 +199,27 @@ class LessonView(HandleAPIView):
             serializer = self.serializer(data=raw_data)
             assert serializer.is_valid()
             serializer.save()
-        except (ValueError, Exception) as _:
+        except (ValueError, AssertionError, Exception) as _:
             _logger.warning('LessonView, failed to create lesson, error:{}'.format(_), exc_info=True)
             return Response({'r': 1, 'errmsg': _})
         else:
             lesson_code.is_occupied = True
             lesson_code.save()
             return Response({'r': 0, 'data': serializer.data})
+
+    def put(self, request, **_):
+        """加入班课
+        """
+        _ = self
+        try:
+            lesson = models.Lesson.objects.filter(lesson_code=request.data['lesson_code']).first()
+            assert lesson.teacher != request.user, '角色类型错误..'
+            lesson.student.add(request.user)
+        except KeyError or Exception as e:
+            _logger.warning('LessonView put error: {}'.format(e))
+            return Response({'r': 1, 'data': '', 'errmsg': e}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
 
 class LessonCodeAPIView(HandleAPIView):
@@ -274,6 +292,8 @@ class LessonIndexPageOverview(HandleAPIView):
         lesson = models.Lesson.objects.filter(lesson_code=lesson_code).first()
         lesson_info = serializers.LessonInfoSerializer(lesson, many=False).data
 
+        # todo 班课首页
+
         lesson_index_info = {
             'lesson_data': lesson_info,
             'resource_num': 0,
@@ -327,7 +347,7 @@ class LessonIndexPageOverview(HandleAPIView):
                         'code': '899b20c069d846e3b3980989dc3925b5',
                     },
                 ],
-                'track_deactive_list': [    # remark: 学生身份不提供该类目
+                'track_deactive_list': [  # remark: 学生身份不提供该类目
                     {
                         'start_time': '2013-01-23 23:00:23',
                         'end_time': '23:20:23',
@@ -363,3 +383,73 @@ class LessonIndexPageOverview(HandleAPIView):
         }
 
         return Response({'r': 0, 'data': lesson_index_info, 'errmg': ''})
+
+
+class FileAPIView(APIView):
+    """文件上传
+    """
+
+    def get(self, request, **_):
+        """下载文件
+        """
+
+    def post(self, request, **_):
+        """上传文件
+        """
+        _ = self
+        is_multiple = request.data.get('mode', False)
+        if not is_multiple:  # WeChat client
+            f_mem = request.data.get('file')
+            f_name = '{}.jpg'.format(uuid.uuid4().hex)
+            fn = fc.save(f_name, f_mem)
+
+            ret = {
+                'r': 0,
+                'data': {
+                    'url': fc.url(fn),
+                }
+            }
+            return Response(ret)
+        else:  # todo browser client  支持多文件上传
+            pass
+
+
+class SayView(HandleAPIView):
+    """课程说说
+    """
+    serializer = serializers.SayingPOSTSerializer
+
+    def get(self, request, **_):
+        """获取课程说说
+        * 推荐
+        * 分页
+        """
+        p = utils.Paginator.num_paginator()
+        pq = p.paginate_queryset(models.Saying.objects.all(), request, self)
+        ser = self.serializer(instance=pq, many=True)
+        return Response({'r': 0, 'errmsg': '', 'data': ser.data})
+
+    def post(self, request, **_):
+        """发布说说
+        """
+        saying = {
+            'publisher_id': request.data.user.id,
+            'content': request.data.get('content', ''),
+            'ext_info': request.data.get('ext_info', '{}'),
+            'related_files': request.data.get('related_files', '[]')
+        }
+
+        ss = self.serializer(data=saying)
+        if not ss.is_valid():
+            return Response({'r': 1, 'errmsg': '发布失败', 'data': ''})
+
+        ss.save()
+        return Response({'r': 0, 'errmsg': '', 'data': '发布成功'})
+
+    def delete(self, request, **_):
+        """删除说说
+        """
+        _ = self
+        s_id = request.data.get('sid')
+        models.Saying.objects.filter(id=s_id).delete()
+        return Response({'r': 0, 'errmsg': '', 'data': '删除成功'})

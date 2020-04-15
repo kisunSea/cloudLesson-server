@@ -1,9 +1,10 @@
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
-from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from wx_client import serializers
+from teaching_helper import glog
+
+_logger = glog.get_logger(__name__)
 
 
 class JWTokenAuth(BaseAuthentication):
@@ -18,8 +19,6 @@ class JWTokenAuth(BaseAuthentication):
 
         user = valid_data['user']
         if user:
-            return (user, None)
+            return user, None
 
         return exceptions.AuthenticationFailed('login failed!')
-
-

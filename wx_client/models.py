@@ -1,6 +1,5 @@
 from datetime import datetime
 import json
-import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -227,7 +226,45 @@ class LessonCode(models.Model):
     is_occupied = models.BooleanField(null=False, verbose_name='是否被占用', default=False)
 
 
-# class Saying(models.Model):
-#     """空间说说
-#     """
-#     pass
+class Saying(models.Model):
+    """话题说说
+    """
+    publisher = models.ForeignKey(UserProfile, related_name='sayings', on_delete=models.CASCADE)
+    content = models.TextField(verbose_name='话题内容', max_length=1000)
+
+    # json格式存储
+    # ['http://image1.png', 'http://image2.png', 'http://image3.png'...]
+    related_files = models.TextField(verbose_name='图片')
+
+    # 目前支持地址信息上传
+    # {
+    #     'address_info': {
+    #         'name': "重庆市渝中区人民政府西北(火药局街)",
+    #         'address': "重庆市渝中区火药局街15号",
+    #         'latitude': 29.55314,
+    #         'longitude': 106.5686
+    #     }
+    # }
+    ext_info = models.TextField(verbose_name='扩展信息', default='{}')
+
+    @property
+    def images(self):
+        return json.loads(self.related_files)
+
+    @property
+    def address(self):
+        return json.loads(self.ext_info)
+
+
+class SayingComment(models.Model):
+    """话题说说的评论
+    """
+    parent = models.ForeignKey('SayingComment', verbose_name='父级评论', related_name='child_comments', null=True,
+                               blank=True, on_delete=models.CASCADE)
+    text = models.TextField(max_length=256, verbose_name='评论内容')
+    user = models.ForeignKey(UserProfile, related_name='my_comments', on_delete=models.PROTECT)
+    Saying = models.ForeignKey(Saying, related_name='saying_comments', on_delete=models.CASCADE)
+    root = models.ForeignKey('SayingComment', verbose_name='根评论',
+                             related_name='sub_comments', on_delete=models.CASCADE)
+    comment_time = models.DateTimeField(auto_created=True)
+    is_delete = models.BooleanField(default=False)

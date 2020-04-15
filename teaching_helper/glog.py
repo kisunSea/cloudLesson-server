@@ -117,3 +117,21 @@ class APIViewCatchException(BaseDecorator):
                 return Response(data=e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         setattr(self.obj, func_name, new_method)
+
+
+# 当方法内发生异常时，返回 value
+def convert_exception_to_value(value):
+    def _real_decorator(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kv):
+            try:
+                return fn(*args, **kv)
+            except Exception as e:
+                logging.getLogger(fn.__module__).error(
+                    r'{fn_name} raise Exception need convert to {value} :{e}'.format(
+                        fn_name=fn.__qualname__, e=e, value=value), exc_info=True)
+                return value
+
+        return wrapper
+
+    return _real_decorator

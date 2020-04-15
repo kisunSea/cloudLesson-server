@@ -27,7 +27,7 @@ SECRET_KEY = ')d5u8tcmc*i^y7_j@c+79f!t3+!h=0ug$$n@7&h#+tf(6s&#wz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['134.175.27.71',]
+ALLOWED_HOSTS = ['134.175.27.71', ]
 
 # Application definition
 
@@ -59,8 +59,7 @@ AUTH_USER_MODEL = 'wx_client.UserProfile'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,6 +76,12 @@ WSGI_APPLICATION = 'teaching_helper.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+
+# CREATE USER 'th'@'%' IDENTIFIED BY 'th';
+# CREATE DATABASE th DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+# GRANT ALL PRIVILEGES ON th.* TO 'th'@'%';
+# FLUSH PRIVILEGES;
 
 DATABASES = {
     'default': {
@@ -143,6 +148,13 @@ REST_FRAMEWORK = {
     'VERSION_PARAM': 'version',  # url arg
     'DEFAULT_VERSION': 'v1',  # default version
 
+    # request parser
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',  # 'application/json'
+        'rest_framework.parsers.FormParser',  # 'application/x-www-form-urlencoded'
+        'rest_framework.parsers.MultiPartParser'  # multipart/form-data
+    ],
+
 }
 
 JWT_AUTH = {
@@ -156,4 +168,4 @@ JWT_AUTH = {
 DEFAULT_FILE_STORAGE = 'fdfs_storage.FastDFSStorage'
 
 FDFS_URL = 'http://134.175.27.71/'
-FDFS_CLIENT_CONF = r'/etc/fdfs/client.conf'
+FDFS_CLIENT_CONF = '/etc/fdfs/client.conf'

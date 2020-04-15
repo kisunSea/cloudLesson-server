@@ -1,15 +1,15 @@
 import jwt
-import datetime
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
-from wx_client import models
 
 from teaching_helper import gdata
 from teaching_helper import glog
 from utils import JWTHandler
+from wx_client import models
 from wx_client import models as wx_m
 
 _logger = glog.get_logger(__name__)
+
 
 class JWTVerificationSerializer(serializers.Serializer):
     """
@@ -73,7 +73,6 @@ class JWTVerificationSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.Serializer):
-
     u_uuid = serializers.UUIDField(required=True)
     gender = serializers.ChoiceField(choices=gdata.GENDER_CHOICES, default=gdata.UNKNOWN)
     nickName = serializers.CharField(required=True, max_length=32)
@@ -100,7 +99,6 @@ class UserProfileSerializer(serializers.Serializer):
 
 
 class FeatureForSignInSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.FeatureForSignIn
         fields = ('face_token', 'base64_face')
@@ -130,7 +128,6 @@ class LessonSerializer(serializers.ModelSerializer):
     teacher_id = serializers.IntegerField(required=True)
 
     class Meta:
-
         model = models.Lesson
         fields = (
             'teacher_id',
@@ -145,8 +142,29 @@ class LessonSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class LessonInfoSerializer(serializers.Serializer):
+class LessonInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Lesson
         fields = '__all__'
+        depth = 1
+
+
+class SayingInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Saying
+        fields = '__all__'
+        depth = 1
+
+
+class SayingPOSTSerializer(serializers.ModelSerializer):
+    publisher_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = models.Saying
+        fields = (
+            'publisher_id',
+            'content',
+            'related_files',
+            'ext_info',
+        )
         depth = 1
