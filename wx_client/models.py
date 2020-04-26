@@ -246,6 +246,9 @@ class Saying(models.Model):
     #     }
     # }
     ext_info = models.TextField(verbose_name='扩展信息', default='{}')
+    pub_time = models.DateTimeField(verbose_name='发布时间', auto_created=True, default=timezone.now)
+    good_num = models.BigIntegerField(default=0, null=False, blank=False)
+    favor_num = models.BigIntegerField(default=0, null=False, blank=False)
 
     @property
     def images(self):
@@ -254,6 +257,10 @@ class Saying(models.Model):
     @property
     def address(self):
         return json.loads(self.ext_info)
+
+    @property
+    def comments_num(self):
+        return self.saying_comments.count()
 
 
 class SayingComment(models.Model):

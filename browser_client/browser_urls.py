@@ -1,14 +1,12 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
 from browser_client import views
 
 app_name = 'browser_client'
 
 urlpatterns = [
 
-    # POST    注册用户
-    # GET     获取用户信息
-    # PUT     更新用户信息
-    # DELETE  注销用户
-    # url('^/user$', views.UserInfoView.as_view(), name='user'),
+    # GET    get login page
+    # POST   login
+    url(r'^login$', views.LoginView.as_view(), name='login'),
 
 ]

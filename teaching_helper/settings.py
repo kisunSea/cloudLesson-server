@@ -129,6 +129,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_DIRS = (
+    os.path.join(BASE_DIR, 'browser_client/static')
+)
 
 # ----------------------------------------
 # restful configuration
@@ -154,6 +157,10 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',  # 'application/x-www-form-urlencoded'
         'rest_framework.parsers.MultiPartParser'  # multipart/form-data
     ],
+
+    # pagination
+    'DEFAULT_PAGINATION_CLASS':  'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10  # 每页数目
 
 }
 

@@ -26,3 +26,19 @@ class QueryUserProfileHelper(object):
         if not user:
             _logger.warning('Failed to get object of UserProfile by encrypted_code:{}'.format(encrypted_code))
         return user
+
+
+class QuerySayingHelper(object):
+
+    @staticmethod
+    def query_all_sayings():
+        return wx_m.Saying.objects.all()
+
+    @staticmethod
+    def query_all_ordered_sayings():
+        return wx_m.Saying.objects.order_by('-pub_time').all()
+
+    @staticmethod
+    def query_ordered_sayings_by_user(user):
+        assert isinstance(user, wx_m.UserProfile)
+        return wx_m.Saying.objects.filter(publisher=user).order_by('-pub_time').all()

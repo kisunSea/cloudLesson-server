@@ -1,3 +1,5 @@
+import json
+
 import jwt
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -76,9 +78,10 @@ class UserProfileSerializer(serializers.Serializer):
     u_uuid = serializers.UUIDField(required=True)
     gender = serializers.ChoiceField(choices=gdata.GENDER_CHOICES, default=gdata.UNKNOWN)
     nickName = serializers.CharField(required=True, max_length=32)
+    username = serializers.CharField(max_length=150, required=True)
     encrypted_code = serializers.CharField(required=True, max_length=128)
-    country = serializers.CharField(max_length=32, default='', required=False)
-    province = serializers.CharField(max_length=32, required=False)
+    country = serializers.CharField(max_length=32, default='', required=False, allow_blank=True)
+    province = serializers.CharField(max_length=32, required=False, allow_blank=True)
     city = serializers.CharField(max_length=32, required=False, allow_blank=True)
     tel = serializers.CharField(max_length=11, required=False, allow_blank=True)
     avatarUrl = serializers.URLField(required=True)
@@ -96,6 +99,19 @@ class UserProfileSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         pass
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.UserProfile
+        fields = (
+            'u_uuid',
+            'gender',
+            'nickName',
+            'avatarUrl',
+        )
+        depth = 1
 
 
 class FeatureForSignInSerializer(serializers.ModelSerializer):
@@ -150,10 +166,25 @@ class LessonInfoSerializer(serializers.ModelSerializer):
 
 
 class SayingInfoSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Saying
         fields = '__all__'
         depth = 1
+
+    publisher = UserInfoSerializer()
+    ext_info = serializers.SerializerMethodField()
+    related_files = serializers.SerializerMethodField()
+    comments_num = serializers.SerializerMethodField()
+
+    def get_ext_info(self, obj: models.Saying):
+        return obj.address
+
+    def get_related_files(self, obj: models.Saying):
+        return obj.images
+
+    def get_comments_num(self, obj: models.Saying):
+        return obj.comments_num
 
 
 class SayingPOSTSerializer(serializers.ModelSerializer):

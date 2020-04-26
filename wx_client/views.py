@@ -7,12 +7,14 @@ from urllib.parse import urljoin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 
 import encryption
+import utils
 import model_access as mc
 from teaching_helper import gdata
 from teaching_helper import glog
-import utils
+# from wx_client import paginator
 from wx_api import WxAPIAccess
 from wx_client import models
 from wx_client import serializers
@@ -67,18 +69,19 @@ class UserRegister(HandleAPIView):
 
         # 用户首次登陆
         if not user:
-            user_info.update({'encrypted_code': encrypted_code, 'u_uuid': u_uuid})
+            user_info.update({'encrypted_code': encrypted_code, 'u_uuid': u_uuid, 'username': u_uuid.hex})
             _logger.debug('user_info:\t{}'.format(user_info))
             serializer = UserRegister.serializer(data=user_info)
             if not serializer.is_valid():
                 _logger.error(
-                    "User `{}` failed to login. serializer-data is invalid.".format(user_info.get('nickName', '')))
+                    "User `{}` failed to login. serializer-data is invalid. error:{}".format(
+                        user_info.get('nickName', ''), serializer.errors))
                 return Response({'r': 0, 'errmsg': '注册失败'})
 
             user = models.UserProfile.objects.create(**serializer.data)
             _logger.info('create user `<UserProfile:{}>` successfully...'.format(user.nickName))
 
-        # 签发JWToken
+        # 签发JWTToken
         payload = utils.JWTHandler.jwt_payload_handler(user)
         token = utils.JWTHandler.jwt_encode_handler(payload)
         return Response({'r': 0, 'data': token})
@@ -397,8 +400,8 @@ class FileAPIView(APIView):
         """上传文件
         """
         _ = self
-        is_multiple = request.data.get('mode', False)
-        if not is_multiple:  # WeChat client
+        client_type = request.data.get('mode', 'wx')
+        if client_type == 'wx':  # WeChat client
             f_mem = request.data.get('file')
             f_name = '{}.jpg'.format(uuid.uuid4().hex)
             fn = fc.save(f_name, f_mem)
@@ -417,29 +420,30 @@ class FileAPIView(APIView):
 class SayView(HandleAPIView):
     """课程说说
     """
-    serializer = serializers.SayingPOSTSerializer
+    post_serializer = serializers.SayingPOSTSerializer
+    info_serializer = serializers.SayingInfoSerializer
 
     def get(self, request, **_):
         """获取课程说说
         * 推荐
         * 分页
         """
-        p = utils.Paginator.num_paginator()
-        pq = p.paginate_queryset(models.Saying.objects.all(), request, self)
-        ser = self.serializer(instance=pq, many=True)
+        p = PageNumberPagination()
+        pq = p.paginate_queryset(mc.QuerySayingHelper.query_all_ordered_sayings(), request, self)
+        ser = self.info_serializer(instance=pq, many=True)
         return Response({'r': 0, 'errmsg': '', 'data': ser.data})
 
     def post(self, request, **_):
         """发布说说
         """
         saying = {
-            'publisher_id': request.data.user.id,
+            'publisher_id': request.user.id,
             'content': request.data.get('content', ''),
             'ext_info': request.data.get('ext_info', '{}'),
             'related_files': request.data.get('related_files', '[]')
         }
 
-        ss = self.serializer(data=saying)
+        ss = self.post_serializer(data=saying)
         if not ss.is_valid():
             return Response({'r': 1, 'errmsg': '发布失败', 'data': ''})
 
