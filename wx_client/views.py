@@ -1,31 +1,33 @@
-import uuid
+import copy
 import random
 import string
-import copy
+import uuid
 from urllib.parse import urljoin
 
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 
 import encryption
-import utils
 import model_access as mc
+import utils
+from fdfs_storage import fc
 from teaching_helper import gdata
 from teaching_helper import glog
-# from wx_client import paginator
+from utils import DictResponse
 from wx_api import WxAPIAccess
 from wx_client import models
 from wx_client import serializers
-from fdfs_storage import fc
 
 _logger = glog.get_logger(__name__)
 
 
 class HandleAPIView(APIView):
-    """
-    自动为类装饰异常捕捉器
+    """自动为类装饰异常捕捉器
+
+    使用该类作为基类，能做什么？
+        1. 自动捕捉视图逻辑的所有类型异常
+        2. 输出错误栈至日志
     """
 
     def __init__(self, *args, **kwargs):
@@ -43,6 +45,18 @@ class UserRegister(HandleAPIView):
     serializer = serializers.UserProfileSerializer
 
     def post(self, request, **_):
+        """登录/注册视图逻辑
+
+        :return:
+         1. 失败时
+            {'r': 1,
+             'data': '',
+             'errmsg': 失败原因}
+         2. 成功
+            {'r': 0,
+             'errmsg': '',
+             'data': jwt_token}
+        """
 
         code = request.data.get('code', '')
         user_info = request.data.get('user_info', '')
@@ -61,7 +75,7 @@ class UserRegister(HandleAPIView):
 
         _, openid = WxAPIAccess.auth_keys(code)
         if not openid:
-            return Response({'r': 0, 'errmsg': '登录态创建失败'})
+            return DictResponse(errmsg='登录态创建失败')
 
         encrypted_code = encryption.sha256(openid)
         u_uuid = uuid.uuid4()
@@ -76,7 +90,7 @@ class UserRegister(HandleAPIView):
                 _logger.error(
                     "User `{}` failed to login. serializer-data is invalid. error:{}".format(
                         user_info.get('nickName', ''), serializer.errors))
-                return Response({'r': 0, 'errmsg': '注册失败'})
+                return DictResponse(errmsg='注册失败')
 
             user = models.UserProfile.objects.create(**serializer.data)
             _logger.info('create user `<UserProfile:{}>` successfully...'.format(user.nickName))
@@ -84,7 +98,7 @@ class UserRegister(HandleAPIView):
         # 签发JWTToken
         payload = utils.JWTHandler.jwt_payload_handler(user)
         token = utils.JWTHandler.jwt_encode_handler(payload)
-        return Response({'r': 0, 'data': token})
+        return DictResponse(r=0, data=token)
 
 
 class UserInfoView(HandleAPIView):
@@ -111,23 +125,45 @@ class FaceProxy(HandleAPIView):
 
     def get(self, request, **_):
         """获取是否已录入人像数据
+
+        :return:  返回值分两种情况
+        1. 用户不存在已录入的人脸数据
+            {'r': 1,
+             'data': ''
+             'errmsg': '未上传人像数据'
+            }
+        2. 用户存在已录入的人脸数据
+            {'r': 0,
+             'errmsg': ''
+             'data': (FeatureForSignIn)obj.face_token  # 人脸唯一标识
+            }
         """
         _ = self
         user = request.user
         face_record = mc.QueryFeatureForSignInHelper.query_face_record_by_user(user)
         if not face_record:
-            return Response({'r': 1, 'errmsg': '未上传人像数据'})
-        return Response({'r': 0, 'errmsg': face_record.face_token})
+            return DictResponse(errmsg='未上传人像数据')
+        return DictResponse(r=0, data=face_record.face_token)
 
     def post(self, request, **_):
         """新建或更新人像数据
+
+        :return:
+        1. 录入人脸数据失败
+            {'r': 1,
+             'errmsg': '未上传人像数据'
+            }
+        2. 成功录入人脸数据
+            {'r': 0,
+             'errmsg': (FeatureForSignIn)obj.face_token  # 人脸唯一标识
+            }
         """
         _ = self
         user = request.user
         serializer = serializers.FeatureForSignInSerializer(data=request.data)
         if not serializer.is_valid():
             _logger.warning('face-data for [UserProfile:{}]: serializer-data is invalid.'.format(user.nickName))
-            return Response({'r': 1, 'errmsg': '人像数据录入失败'})
+            return DictResponse(errmsg='人像数据录入失败')
 
         face_record = mc.QueryFeatureForSignInHelper.query_face_record_by_user(user)
         face_data_dict = serializer.validated_data
@@ -137,7 +173,8 @@ class FaceProxy(HandleAPIView):
             new_face_record = models.FeatureForSignIn(user=user, **face_data_dict)
             new_face_record.save()
         _logger.info('flush the face-data of [UserProfile:{}] to db successfully..'.format(user.nickName))
-        return Response({'r': 0, 'errmsg': '人脸录入成功', 'face_token': face_data_dict.get('face_token', '')})
+        ret_info = {'face_token': face_data_dict.get('face_token', '')}
+        return DictResponse(r=0, errmsg='人脸录入成功', data=ret_info)
 
 
 class SubjectsClassifiesView(HandleAPIView):
@@ -148,11 +185,21 @@ class SubjectsClassifiesView(HandleAPIView):
 
     def get(self, request, **_):
         """获取所有的课程分类
+
+        :return:
+
+        [
+            {'code': 学科分类代码, 'desc': 学科名}
+            {'code': 学科分类代码, 'desc': 学科名}
+            {'code': 学科分类代码, 'desc': 学科名}
+            {'code': 学科分类代码, 'desc': 学科名}
+            .....
+        ]
         """
         _ = self
         _ = request
         ret_data = [dict(code=code, desc=desc) for code, desc in gdata.LESSON_CLS_CHOICE]
-        return Response({'r': 0, 'data': ret_data})
+        return DictResponse({'r': 0, 'data': ret_data})
 
 
 class LessonView(HandleAPIView):
@@ -175,13 +222,13 @@ class LessonView(HandleAPIView):
                                                      many=True).data
         except Exception as e:
             _logger.warn('failed to get information of lessons, error:{}'.format(e), exc_info=True)
-            return Response({'r': 1, 'errmsg': '查询班课失败'})
+            return DictResponse(errmsg='查询班课失败')
         else:
             data = {
                 'create': teaching_lessons,
                 'listen': listening_lessons,
             }
-            return Response({'r': 0, 'errmsg': '', 'data': data})
+            return DictResponse(r=0, data=data)
 
     def post(self, request, **_):
         """创建班课
@@ -204,11 +251,11 @@ class LessonView(HandleAPIView):
             serializer.save()
         except (ValueError, AssertionError, Exception) as _:
             _logger.warning('LessonView, failed to create lesson, error:{}'.format(_), exc_info=True)
-            return Response({'r': 1, 'errmsg': _})
+            return DictResponse(errmsg=_)
         else:
             lesson_code.is_occupied = True
             lesson_code.save()
-            return Response({'r': 0, 'data': serializer.data})
+            return DictResponse(r=0, data=serializer.data)
 
     def put(self, request, **_):
         """加入班课
@@ -220,9 +267,9 @@ class LessonView(HandleAPIView):
             lesson.student.add(request.user)
         except KeyError or Exception as e:
             _logger.warning('LessonView put error: {}'.format(e))
-            return Response({'r': 1, 'data': '', 'errmsg': e}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return DictResponse(errmsg=e, status=status.HTTP_406_NOT_ACCEPTABLE)
         else:
-            return Response(status=status.HTTP_200_OK)
+            return DictResponse(status=status.HTTP_200_OK)
 
 
 class LessonCodeAPIView(HandleAPIView):
@@ -248,7 +295,7 @@ class LessonCodeAPIView(HandleAPIView):
                     new_code_obj.save()
                     break
 
-        return Response({'r': 0, 'data': '生成班课码数据成功...'})
+        return DictResponse(r=0, data='生成班课码数据成功...')
 
 
 class LessonIndexPageOverview(HandleAPIView):
@@ -385,7 +432,7 @@ class LessonIndexPageOverview(HandleAPIView):
             }
         }
 
-        return Response({'r': 0, 'data': lesson_index_info, 'errmg': ''})
+        return DictResponse(r=0, data=lesson_index_info)
 
 
 class FileAPIView(APIView):
@@ -405,14 +452,7 @@ class FileAPIView(APIView):
             f_mem = request.data.get('file')
             f_name = '{}.jpg'.format(uuid.uuid4().hex)
             fn = fc.save(f_name, f_mem)
-
-            ret = {
-                'r': 0,
-                'data': {
-                    'url': fc.url(fn),
-                }
-            }
-            return Response(ret)
+            return DictResponse(r=0, data={'url': fc.url(fn)})
         else:  # todo browser client  支持多文件上传
             pass
 
@@ -431,7 +471,7 @@ class SayView(HandleAPIView):
         p = PageNumberPagination()
         pq = p.paginate_queryset(mc.QuerySayingHelper.query_all_ordered_sayings(), request, self)
         ser = self.info_serializer(instance=pq, many=True)
-        return Response({'r': 0, 'errmsg': '', 'data': ser.data})
+        return DictResponse(r=0, data=ser.data)
 
     def post(self, request, **_):
         """发布说说
@@ -445,10 +485,9 @@ class SayView(HandleAPIView):
 
         ss = self.post_serializer(data=saying)
         if not ss.is_valid():
-            return Response({'r': 1, 'errmsg': '发布失败', 'data': ''})
-
+            return DictResponse(errmsg='发布失败')
         ss.save()
-        return Response({'r': 0, 'errmsg': '', 'data': '发布成功'})
+        return DictResponse(r=0, data='发布成功')
 
     def delete(self, request, **_):
         """删除说说
@@ -456,4 +495,4 @@ class SayView(HandleAPIView):
         _ = self
         s_id = request.data.get('sid')
         models.Saying.objects.filter(id=s_id).delete()
-        return Response({'r': 0, 'errmsg': '', 'data': '删除成功'})
+        return DictResponse(r=0, data='删除成功')

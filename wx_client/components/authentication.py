@@ -1,5 +1,7 @@
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
+from django.utils.decorators import classonlymethod
+from django.contrib.auth.decorators import login_required
 
 from wx_client import serializers
 from teaching_helper import glog
@@ -22,3 +24,11 @@ class JWTokenAuth(BaseAuthentication):
             return user, None
 
         return exceptions.AuthenticationFailed('login failed!')
+
+
+class LoginRequire(object):
+
+    @classonlymethod
+    def as_view(cls, **initkwargs):
+        _v = super(LoginRequire, cls).as_view(**initkwargs)
+        return login_required(_v)

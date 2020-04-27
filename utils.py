@@ -3,6 +3,7 @@ import threading
 
 import jwt
 from django.conf import settings
+from rest_framework.response import Response
 from MyQR import myqr
 
 from teaching_helper import glog
@@ -98,3 +99,19 @@ class QRCodeHelper(object):
         except (AssertionError, Exception) as e:
             _logger.warning('generate_lesson_qr_code, error:{}'.format(e), exc_info=True)
             self.is_successful = False
+
+
+class DictResponse(Response):
+    """字典响应
+
+    :remark:
+        固定返回值(Response)对象的data格式
+        * data: 操作成功后返回的值
+        * errmsg: 出错后的错误提示
+        * r: 操作是否成功，0代表成功，1代表失败
+    """
+
+    def __init__(self, r=1, errmsg='', data='', **kwargs):
+        ret = dict(r=r, errmsg=errmsg, data=data)
+        kwargs['data'] = ret
+        super(DictResponse, self).__init__(**kwargs)
