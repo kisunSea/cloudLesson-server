@@ -1,14 +1,14 @@
 # coding: utf-8
+import threading
 
 """
 提供除内置settings外的全局常量
 """
 
 HTTP_DOMAIN = 'http://134.175.27.71'
-
 DEFAULT_LESSON_IMG = 'http://134.175.27.71/images/lesson_type_computer.jpg'
-
 LESSON_QR_CODE_PATH = r'/usr/local/static/files/images/qrcode'
+LOGIN_QR_CODE_PATH = r'/usr/local/static/files/images/loginqr'
 
 # WeChat api for registering
 
@@ -170,3 +170,16 @@ EVENT_STATUS_OFF_SHELF = '已结束'
 
 LESSON_CODE_NUM = 10000
 LESSON_CODE_LEN = 7
+
+
+# ------------缓存区------------------
+
+# 扫码登录缓存
+# 元素结构：
+# {
+#     'uuid': NamedTuple(effective_time=起效时间, is_success=是否成功, user_id=None, qr_path=None)
+# }
+LOGIN_QR_EXPIRED_SECS = 5 * 60
+LOGIN_QR_CLS_NAME = 'LoginQRItem'
+LOGIN_QR_CODE_CACHE = dict()
+LOGIN_QR_CODE_CACHE_LOCK = threading.Lock()

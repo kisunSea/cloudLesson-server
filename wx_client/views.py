@@ -3,6 +3,7 @@ import random
 import string
 import uuid
 from urllib.parse import urljoin
+import copy
 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
@@ -35,6 +36,26 @@ class HandleAPIView(APIView):
         glog.APIViewCatchException(self, logger=_logger).decorate()
 
 
+class BrowserQRLogin(HandleAPIView):
+    """Browser客户端扫码登录视图
+
+    """
+
+    def put(self, request, **_):
+        _ = self
+
+        with gdata.LOGIN_QR_CODE_CACHE_LOCK:
+            qr_uid = request.data.get('qr_uid')
+
+            login_item = gdata.LOGIN_QR_CODE_CACHE.get(qr_uid, None)
+            if login_item is None:
+                return DictResponse(errmsg='二维码已过期, 请刷新页面')
+
+            login_item.user_id = request.user.id
+            login_item.is_success = True
+            return DictResponse(r=0, data='登陆成功')
+
+
 class UserRegister(HandleAPIView):
     """class for registering
 
@@ -61,6 +82,7 @@ class UserRegister(HandleAPIView):
         code = request.data.get('code', '')
         user_info = request.data.get('user_info', '')
         return self.register_logic(code, user_info)
+
 
     @staticmethod
     def register_logic(code, user_info: dict):
@@ -237,7 +259,7 @@ class LessonView(HandleAPIView):
             user = request.user
             lesson_code = models.LessonCode.objects.filter(is_occupied=False).first()
             qr_helper = utils.QRCodeHelper.qr_code_helper()
-            qr_helper.generate_lesson_qr_code(lesson_code.code)
+            qr_helper.generate_qr_code(lesson_code.code)
             assert qr_helper.is_successful
             qr_url = urljoin(gdata.HTTP_DOMAIN + '/images/qrcode/', '{}.png'.format(lesson_code.code))
             raw_data = copy.deepcopy(request.data)

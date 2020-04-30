@@ -2,7 +2,6 @@ import datetime
 import threading
 
 import jwt
-from django.conf import settings
 from rest_framework.response import Response
 from MyQR import myqr
 
@@ -16,6 +15,7 @@ _logger = glog.get_logger(__name__)
 
 
 def jwt_get_secret_key(_):
+    from django.conf import settings
     return settings.SECRET_KEY
 
 
@@ -86,18 +86,18 @@ class QRCodeHelper(object):
                 setattr(QRCodeHelper, 'ins', QRCodeHelper())
             return getattr(QRCodeHelper, 'ins')
 
-    def generate_lesson_qr_code(self, code):
+    def generate_qr_code(self, code, path=gdata.LESSON_QR_CODE_PATH):
         """生成二维码
         """
         self.is_successful = True
         try:
-            assert isinstance(code, str), '无法生成班课码，无效的类型'
+            assert isinstance(code, str), '无法生成二维码'
             myqr.run(words=code,
                      version=9,
                      save_name='{}.png'.format(code),
-                     save_dir=gdata.LESSON_QR_CODE_PATH)
+                     save_dir=path)
         except (AssertionError, Exception) as e:
-            _logger.warning('generate_lesson_qr_code, error:{}'.format(e), exc_info=True)
+            _logger.warning('generate_qr_code, error:{}'.format(e), exc_info=True)
             self.is_successful = False
 
 

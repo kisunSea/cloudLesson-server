@@ -136,6 +136,14 @@ class ExamQuestion(models.Model):
     # }
     images = models.TextField(max_length=256, null=None)
 
+    # 选项
+    # [
+    #   [A, '选项内容1'],
+    #   [B, '选项内容2'],
+    #   [C, '选项内容3'],
+    # ]
+    questions = models.TextField(default='[]')
+
 
 class TeachingEventTracker(models.Model):
     """教学事件跟踪
