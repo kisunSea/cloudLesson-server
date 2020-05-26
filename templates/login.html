@@ -74,213 +74,213 @@
     </script>
   <!-- 网页版扫码登录 -->
   <script src="{% static 'js/login.js' %}"></script>
-{#  <div class="wrapper J_wrapper login-wraper J_login"> #}
-{#   <div class="wrapper-inner clearfix"> #}
-{#    <h3 class="L_title f30">校园移动教学助手 - 智慧教学解决方案</h3> #}
-{#    <div class="login-box mt90"> #}
-{#     <div class="mabox toggle-box" data-type="qrcode" style="display: none;"> #}
-{#      <img src="./校园移动教学助手网页版-登录_files/o_1e1nt9dbk1r4e11hl1pn2lsg1ai9a.png" class="changeImg" alt="" /> #}
-{#      <div id="support-socket" class="support-socket" style="display: block;"> #}
-{#       <div class="ma"> #}
-{#        <img class="loading-icon" src="./校园移动教学助手网页版-登录_files/c4d5a9f8d3a013f723c6a870d11ca828.gif" alt="校园移动教学助手" style="display: none;" /> #}
-{#        <img class="logma" src="./校园移动教学助手网页版-登录_files/showqrcode" alt="校园移动教学助手" style="display: inline;" /> #}
-{#        <div class="load-fail" style="display: none;"> #}
-{#         <img src="./校园移动教学助手网页版-登录_files/225b402d6c57f43b901901f338b400da.png" alt="" /> #}
-{#         <div class="bg"></div> #}
-{#         <div class="desc"> #}
-{#          <div class="fail-text">#}
-{#           二维码获取失败#}
-{#          </div> #}
-{#          <div class="fetch-btn">#}
-{#           重新获取#}
-{#          </div> #}
-{#         </div> #}
-{#        </div> #}
-{#       </div> #}
-{#       <p class="tip_wechat">请使用微信扫描二维码登录</p> #}
-{#       <p class="tip">首次使用需先关注公众号</p> #}
-{#      </div> #}
-{#      <div id="not-support-socket" class="not-support-socket"> #}
-{#       <img src="./校园移动教学助手网页版-登录_files/o_1dp4r6fguu6rscc1lblg381jpk9.png" alt="" /> #}
-{#       <p> “无法获取二维码，您可使用账号密码登录，或尝试其他浏览器。绑定其他登录方式并设定密码，请至校园移动教学助手公众号，进入个人中心（课程-我-设置）” </p> #}
-{#      </div> #}
-{#     </div> #}
-{#     <div class="account-box toggle-box" data-type="account" style="display: block;"> #}
-{#      <img src="./校园移动教学助手网页版-登录_files/o_1e1nt9dbkv21qlsib1btb12ftb.png" class="changeImg" alt="" /> #}
-{#      <div class="tab-box"> #}
-{#       <div class="item" data-type="phone">#}
-{#        手机登录#}
-{#       </div> #}
-{#       <div class="item" data-type="message">#}
-{#        短信登录#}
-{#       </div> #}
-{#       <div class="item active" data-type="email">#}
-{#        邮箱登录#}
-{#       </div> #}
-{#      </div> #}
-{#      <div class="content-box"> #}
-{#       <div class="form-box phone" style="display: none;"> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <div class="areaBox c333">#}
-{#            +86 #}
-{#            <i class="iconfont icon-unfold f14"></i>#}
-{#           </div> #}
-{#           <i class="gap"></i> #}
-{#           <input type="mobile" placeholder="输入手机号" name="loginname" /> #}
-{#          </div> #}
-{#          <div class="right help"> #}
-{#           <i class="iconfont icon-weichenggong"></i> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="password" name="password" placeholder="输入密码" /> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#       </div> #}
-{#       <div class="form-box message" style="display: none;"> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <div class="areaBox c333">#}
-{#            +86 #}
-{#            <i class="iconfont icon-unfold f14"></i>#}
-{#           </div> #}
-{#           <i class="gap"></i> #}
-{#           <input type="mobile" placeholder="输入手机号" name="loginname" /> #}
-{#          </div> #}
-{#          <div class="right help"> #}
-{#           <i class="iconfont icon-weichenggong"></i> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="text" maxlength="6" placeholder="输入验证码" /> #}
-{#          </div> #}
-{#          <div class="right verify_code">#}
-{#           获取验证码#}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#       </div> #}
-{#       <div class="form-box email" style="display: block;"> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="email" placeholder="输入邮箱" name="loginname" /> #}
-{#          </div> #}
-{#          <div class="right help"> #}
-{#           <i class="iconfont icon-weichenggong"></i> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="password" name="password" placeholder="输入密码" /> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#       </div> #}
-{#       <div class="forget-password">#}
-{#        <span>忘记密码</span>#}
-{#       </div> #}
-{#       <div class="submit-btn login-btn disabled">#}
-{#        登录#}
-{#       </div> #}
-{#       <div class="login-tip">#}
-{#        *若已有校园移动教学助手、学堂在线账号均可登录*#}
-{#       </div> #}
-{#       <div class="phone-tip"> #}
-{#        <p>请至“校园移动教学助手”公众号，进入个人中心（课程 -我 - 设置）绑定其他登录方式并设定/修改密码。</p> #}
-{#        <p>新用户需扫描微信二维码注册。</p> #}
-{#       </div> #}
-{#      </div> #}
-{#     </div> #}
-{#     <div class="reset-box"> #}
-{#      <div class="header"> #}
-{#       <div class="back close-reset"> #}
-{#        <i class="iconfont icon-fanhui"></i>返回 #}
-{#       </div> #}
-{#       <h2>手机找回密码</h2> #}
-{#      </div> #}
-{#      <div class="content-box"> #}
-{#       <div class="form-box reset" style="display: none;"> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <div class="areaBox c333">#}
-{#            +86 #}
-{#            <i class="iconfont icon-unfold f14"></i>#}
-{#           </div> #}
-{#           <i class="gap"></i> #}
-{#           <input type="mobile" placeholder="输入手机号" /> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="text" maxlength="6" placeholder="输入验证码" /> #}
-{#          </div> #}
-{#          <div class="right verify_code" data-type="reset">#}
-{#           获取验证码#}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="password" name="new" placeholder="设置新密码" /> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#        <div class="form-item"> #}
-{#         <div class="input-box"> #}
-{#          <div class="left box-center"> #}
-{#           <input type="password" name="confirm" placeholder="再输入一次密码" /> #}
-{#          </div> #}
-{#         </div> #}
-{#         <div class="error-box"></div> #}
-{#        </div> #}
-{#       </div> #}
-{#       <div class="submit-btn reset-btn disabled">#}
-{#        确定#}
-{#       </div> #}
-{#      </div> #}
-{#      <div class="reset-success"> #}
-{#       <i class="iconfont icon-correct"></i> 设置成功 #}
-{#      </div> #}
-{#     </div> #}
-{#    </div> #}
-{#   </div> #}
-{#  </div> #}
-{#  <div class="page-footer J_login"> #}
-{#   <div class="footer-inner clearfix"> #}
-{#    <div class="logo-info fl">#}
-{#     <a href="https://www.yuketang.cn/"><img class="logo" src="./校园移动教学助手网页版-登录_files/o_1bpt0h93t1ri512qp70s1cbvn4j9.png" alt="校园移动教学助手" /></a>#}
-{#    </div> #}
-{#    <div class="copyright fr">#}
-{#     &copy; 2020 清华大学 &amp; 学堂在线#}
-{#    </div> #}
-{#   </div> #}
-{#  </div> #}
+  <div class="wrapper J_wrapper login-wraper J_login">
+   <div class="wrapper-inner clearfix">
+    <h3 class="L_title f30">校园移动教学助手 - 智慧教学解决方案</h3>
+    <div class="login-box mt90">
+     <div class="mabox toggle-box" data-type="qrcode" style="display: none;">
+      <img src="./校园移动教学助手网页版-登录_files/o_1e1nt9dbk1r4e11hl1pn2lsg1ai9a.png" class="changeImg" alt="" />
+      <div id="support-socket" class="support-socket" style="display: block;">
+       <div class="ma">
+        <img class="loading-icon" src="./校园移动教学助手网页版-登录_files/c4d5a9f8d3a013f723c6a870d11ca828.gif" alt="校园移动教学助手" style="display: none;" />
+        <img class="logma" src="./校园移动教学助手网页版-登录_files/showqrcode" alt="校园移动教学助手" style="display: inline;" />
+        <div class="load-fail" style="display: none;">
+         <img src="./校园移动教学助手网页版-登录_files/225b402d6c57f43b901901f338b400da.png" alt="" />
+         <div class="bg"></div>
+         <div class="desc">
+          <div class="fail-text">
+           二维码获取失败
+          </div>
+          <div class="fetch-btn">
+           重新获取
+          </div>
+         </div>
+        </div>
+       </div>
+       <p class="tip_wechat">请使用微信扫描二维码登录</p>
+       <p class="tip">首次使用需先关注公众号</p>
+      </div>
+      <div id="not-support-socket" class="not-support-socket">
+       <img src="./校园移动教学助手网页版-登录_files/o_1dp4r6fguu6rscc1lblg381jpk9.png" alt="" />
+       <p> “无法获取二维码，您可使用账号密码登录，或尝试其他浏览器。绑定其他登录方式并设定密码，请至校园移动教学助手公众号，进入个人中心（课程-我-设置）” </p>
+      </div>
+     </div>
+     <div class="account-box toggle-box" data-type="account" style="display: block;">
+      <img src="./校园移动教学助手网页版-登录_files/o_1e1nt9dbkv21qlsib1btb12ftb.png" class="changeImg" alt="" />
+      <div class="tab-box">
+       <div class="item" data-type="phone">
+        手机登录
+       </div>
+       <div class="item" data-type="message">
+        短信登录
+       </div>
+       <div class="item active" data-type="email">
+        邮箱登录
+       </div>
+      </div>
+      <div class="content-box">
+       <div class="form-box phone" style="display: none;">
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <div class="areaBox c333">
+            +86
+            <i class="iconfont icon-unfold f14"></i>
+           </div>
+           <i class="gap"></i>
+           <input type="mobile" placeholder="输入手机号" name="loginname" />
+          </div>
+          <div class="right help">
+           <i class="iconfont icon-weichenggong"></i>
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="password" name="password" placeholder="输入密码" />
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+       </div>
+       <div class="form-box message" style="display: none;">
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <div class="areaBox c333">
+            +86
+            <i class="iconfont icon-unfold f14"></i>
+           </div>
+           <i class="gap"></i>
+           <input type="mobile" placeholder="输入手机号" name="loginname" />
+          </div>
+          <div class="right help">
+           <i class="iconfont icon-weichenggong"></i>
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="text" maxlength="6" placeholder="输入验证码" />
+          </div>
+          <div class="right verify_code">
+           获取验证码
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+       </div>
+       <div class="form-box email" style="display: block;">
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="email" placeholder="输入邮箱" name="loginname" />
+          </div>
+          <div class="right help">
+           <i class="iconfont icon-weichenggong"></i>
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="password" name="password" placeholder="输入密码" />
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+       </div>
+       <div class="forget-password">
+        <span>忘记密码</span>
+       </div>
+       <div class="submit-btn login-btn disabled">
+        登录
+       </div>
+       <div class="login-tip">
+        *若已有校园移动教学助手、学堂在线账号均可登录*
+       </div>
+       <div class="phone-tip">
+        <p>请至“校园移动教学助手”公众号，进入个人中心（课程 -我 - 设置）绑定其他登录方式并设定/修改密码。</p>
+        <p>新用户需扫描微信二维码注册。</p>
+       </div>
+      </div>
+     </div>
+     <div class="reset-box">
+      <div class="header">
+       <div class="back close-reset">
+        <i class="iconfont icon-fanhui"></i>返回
+       </div>
+       <h2>手机找回密码</h2>
+      </div>
+      <div class="content-box">
+       <div class="form-box reset" style="display: none;">
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <div class="areaBox c333">
+            +86
+            <i class="iconfont icon-unfold f14"></i>
+           </div>
+           <i class="gap"></i>
+           <input type="mobile" placeholder="输入手机号" />
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="text" maxlength="6" placeholder="输入验证码" />
+          </div>
+          <div class="right verify_code" data-type="reset">
+           获取验证码
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="password" name="new" placeholder="设置新密码" />
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+        <div class="form-item">
+         <div class="input-box">
+          <div class="left box-center">
+           <input type="password" name="confirm" placeholder="再输入一次密码" />
+          </div>
+         </div>
+         <div class="error-box"></div>
+        </div>
+       </div>
+       <div class="submit-btn reset-btn disabled">
+        确定
+       </div>
+      </div>
+      <div class="reset-success">
+       <i class="iconfont icon-correct"></i> 设置成功
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="page-footer J_login">
+   <div class="footer-inner clearfix">
+    <div class="logo-info fl">
+     <a href="https://www.yuketang.cn/"><img class="logo" src="./校园移动教学助手网页版-登录_files/o_1bpt0h93t1ri512qp70s1cbvn4j9.png" alt="校园移动教学助手" /></a>
+    </div>
+    <div class="copyright fr">
+     &copy; 校园移动教学助手系统
+    </div>
+   </div>
+  </div>
   <script src="{% static 'js/raven.min.js' %}"></script>
   <script>
         Raven.config('https://ab81288797fc4737b315dde851599c4c@rain-sentry.xuetangx.com/11', {

@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap-grid.css" rel="stylesheet">
+    <link href="{% static 'css/login.css' %}">
+    <link type="image/x-icon" rel="shortcut icon" href="http://134.175.27.71/images/favicon.ico" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.js"></script>
+    <title>移动教学助手系统网页版-登陆入口</title>
+</head>
+<style></style>
+<body style="margin: 0;">
+
+    <!--背景图片层-->
+    <div id="back_imgs">
+        <img class="back" src="http://134.175.27.71/images/back_1.jpg" alt="dasdasda">
+    </div>
+    <!--蒙版层-->
+    <div id="back_shadow"></div>
+
+    <!--主体表单-->
+    <div id="main">
+        <div class="main_title column">
+            <h2>校园移动教学助手 网页版-登陆入口</h2>
+            <div class="description">
+                特别说明：该登陆入口仅限教师角色，用于上传课件、试题库、演示文件等等类型的课堂资源文件，后续版本将支持学生用户登录，并优化改进网页版的功能
+            </div>
+        </div>
+
+        <div class="center">
+            <img src="" alt="扫码登录">
+            <div id="login-form">
+
+            </div>
+        </div>
+    </div>
+
+    <!--定时刷新背景图片-->
+    <script type="application/javascript">
+        $(function () {
+            let imgs = ["http://134.175.27.71/images/back_1.jpg", "http://134.175.27.71/images/back_2.jpg"];
+            let i = 0;
+            let head = $("#back_imgs > .back");
+            setInterval(function () {
+                i++;
+                i = i % 2;         // 超过2则取余数，保证循环在0、1、2之间
+                head.attr('src', imgs[i])
+            }, 3000);
+        });
+    </script>
+
+    <!--轮询扫码事件-->
+    <script>
+
+    </script>
+
+    <!--轮询-->
+    <script>
+
+    </script>
+</body>
+</html>

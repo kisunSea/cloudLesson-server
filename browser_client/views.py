@@ -41,17 +41,17 @@ class LoginRequiredView(HandleExceptionView, LoginRequire):
     pass
 
 
-class LoginView(HandleExceptionView):
+class LoginView(View):
     """Web端登录视图
 
     :remark:
     1. 该接口所有用户（不校验用户的登录态）均可以访问
     2. 仅处理用户的登录逻辑
     """
-
-    def __init__(self, **kwargs):
-        super(LoginView, self).__init__(**kwargs)
-        glog.APIViewCatchException(self, _logger).decorate()
+    #
+    # def __init__(self, **kwargs):
+    #     super(LoginView, self).__init__(**kwargs)
+    #     glog.APIViewCatchException(self, _logger).decorate()
 
     def get(self, request, **_):
         """登录界面
@@ -73,10 +73,8 @@ class LoginView(HandleExceptionView):
         with gdata.LOGIN_QR_CODE_CACHE_LOCK:
             gdata.LOGIN_QR_CODE_CACHE[qr_uid] = login_qr_obj
 
-        page_data = {
-            'login_qr_addr': qr_url,
-        }
-        return render(request, 'login.html', context=page_data)
+        page_data = {'login_qr_addr': qr_url}
+        return render(request, 'login_index.html', context=page_data)
 
     def post(self, request, **_):
         """效验用户是否登陆成功，若成功则跳转界面并将session存储在浏览器.

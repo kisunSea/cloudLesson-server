@@ -1,0 +1,34 @@
+
+#back_imgs {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    max-width: none;
+    z-index: -999999;
+    left: 0;
+    top: -245.125px;
+}
+
+body{
+    padding: 0!important;
+    margin: 0!important;
+}
+
+.row{
+    justify-content: center;
+}
+
+#main{
+    position: absolute;
+    width: 780px;
+    margin: 100px auto;
+}
+
+#main > .main_title{
+    align-items: center;
+}
+
