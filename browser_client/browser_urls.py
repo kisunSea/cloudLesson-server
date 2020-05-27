@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from browser_client import views
+from django.contrib.auth.decorators import login_required
 
 app_name = 'browser_client'
 
@@ -9,4 +10,6 @@ urlpatterns = [
     # POST   login
     url(r'^login$', views.LoginView.as_view(), name='login'),
 
+    # GET    return index pageView
+    url(r'^index$', login_required(views.UploadFile.as_view()), name='upload_file')
 ]

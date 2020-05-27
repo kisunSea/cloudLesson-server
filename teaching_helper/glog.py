@@ -11,6 +11,8 @@ import typing
 
 from rest_framework import status
 from rest_framework.response import Response
+from django.http import JsonResponse
+from django.shortcuts import HttpResponse, render
 
 from teaching_helper import gdata
 
@@ -109,7 +111,7 @@ class APIViewCatchException(BaseDecorator):
         def new_method(*args, **kwargs):
             try:
                 _response = func(*args, **kwargs)
-                if not isinstance(_response, Response):
+                if not isinstance(_response, (Response, render, HttpResponse, JsonResponse)):
                     raise Exception('内部异常，响应类型错误.')
                 return _response
             except Exception as e:

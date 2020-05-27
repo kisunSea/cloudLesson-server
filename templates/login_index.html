@@ -1,4 +1,4 @@
-{% load static %}
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
@@ -155,6 +155,32 @@
         padding-left: 20px;
         border: 1px solid #ccc;
     }
+
+    #back_shadow{
+        height: 100%;
+        width: 100%;
+        background-color: #222;
+        opacity: 0.5;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    #tip{
+        width: 396px;
+        height: 100px;
+        text-align: center;
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        margin-left: -198px;
+        color: #fff;
+        font-size: 40px;
+        z-index: 1001;
+        font-weight: 600;
+    }
+
 </style>
 <body style="margin: 0;">
 
@@ -163,7 +189,8 @@
         <img class="back" src="http://134.175.27.71/images/back_1.jpg" alt="dasdasda">
     </div>
     <!--蒙版层-->
-    <div id="back_shadow"></div>
+    <div id="back_shadow" class="hidden"></div>
+    <div id="tip" class="hidden">扫描成功！等待跳转...</div>
 
     <!--主体表单-->
     <div id="main">
@@ -197,6 +224,14 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $.ajaxSetup({
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }
+        })
+    </script>
 
     <!--定时刷新背景图片-->
     <script type="application/javascript">
@@ -232,7 +267,7 @@
     <!--轮询扫码事件-->
     <script>
         var interval_post = null;
-        const interval = 2000;
+        const interval = 5000;
 
         function handler(){
             $.post(
@@ -241,7 +276,13 @@
                         'random_code': '{{ auth_key }}',
                     },
                     function (ret) {  // 成功之后的回调
-                        console.log(ret);
+                        let url = ret.url;
+                        if (url.length != 0){
+                            clearInterval(interval_post); // 停止轮询并跳转
+                            $('#tip').removeClass('hidden');
+                            $('#back_shadow').removeClass('hidden');
+                            setTimeout("javascript:location.href=\'"+ url +"\'", 5000);  // 定时跳转
+                        }
                     }
                 )
         }

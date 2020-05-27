@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from django.views import View
 from django.shortcuts import render
 from django.contrib.auth import get_user_model, login, logout
+from django.http import JsonResponse
 from teaching_helper import glog
 from teaching_helper import gdata
 from wx_client.components.authentication import LoginRequire
@@ -73,20 +74,29 @@ class LoginView(View):
     def post(self, request, **_):
         """效验用户是否登陆成功，若成功则跳转界面并将session存储在浏览器.
         """
-        login_id = request.POST.get('random_code')
-        with gdata.LOGIN_QR_CODE_CACHE_LOCK:
-            qr_code_cache = gdata.LOGIN_QR_CODE_CACHE
+        try:
+            login_id = request.POST.get('random_code')
+            with gdata.LOGIN_QR_CODE_CACHE_LOCK:
+                qr_code_cache = gdata.LOGIN_QR_CODE_CACHE
 
-        login_record = qr_code_cache.get(login_id)
-        if not login_record:
-            return DictResponse(errmsg='登录失败, 请刷新页面并重新尝试')
+            login_record = qr_code_cache.get(login_id)  # type: utils.LoginQRItem
+            _logger.debug('login authenticator item: {}'.format(login_record))
+            if not login_record:
+                return JsonResponse({'url': '', 'errmsg': '请刷新页面并重新尝试'})
+            if login_record and login_record.user_id is None:
+                return JsonResponse({'url': '', 'errmsg': '请打开微信扫码'})
 
-        login(request, User(id=login_record.user_id))
-        del qr_code_cache[login_id]
+            login(request, User(id=login_record.user_id))
+            del qr_code_cache[login_id]
+            return JsonResponse({'url': urljoin(gdata.HTTP_DOMAIN, 'api/v1/browser_client/index'), 'errmsg': ''})
+        except (ValueError, Exception) as e:
+            _logger.warning('效验登录态失败: {}'.format(e), exc_info=True)
+
+
+class UploadFile(View):
+
+    def get(self, request, **_):
         return render(request, 'upload_index.html')
-
-
-class UploadFile(LoginRequiredView):
 
     def post(self, request, **_):
         pass

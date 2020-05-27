@@ -28,6 +28,7 @@ SECRET_KEY = ')d5u8tcmc*i^y7_j@c+79f!t3+!h=0ug$$n@7&h#+tf(6s&#wz'
 DEBUG = True
 
 ALLOWED_HOSTS = ['134.175.27.71', ]
+LOGIN_URL = '/api/v1/browser_client/login'
 
 # Application definition
 
@@ -46,7 +47,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
