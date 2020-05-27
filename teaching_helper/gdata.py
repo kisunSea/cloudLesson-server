@@ -9,6 +9,7 @@ HTTP_DOMAIN = 'http://134.175.27.71'
 DEFAULT_LESSON_IMG = 'http://134.175.27.71/images/lesson_type_computer.jpg'
 LESSON_QR_CODE_PATH = r'/home/ubuntu/static_files/images/qrcode'
 LOGIN_QR_CODE_PATH = r'/home/ubuntu/static_files/images/loginqr'
+EXAM_TEMPLATE_PATH= r'/home/ubuntu/Downloads/quiz_template.xls'
 
 # WeChat api for registering
 

@@ -49,7 +49,7 @@ class BrowserQRLogin(HandleAPIView):
             _logger.debug('=============cache: {}'.format(gdata.LOGIN_QR_CODE_CACHE))
             login_item = gdata.LOGIN_QR_CODE_CACHE.get(qr_uid, None)
             if login_item is None:
-                return DictResponse(errmsg='二维码已过期, 请刷新页面')
+                return DictResponse(data='二维码已过期, 请刷新页面')
 
             login_item.user_id = request.user.id
             login_item.is_success = True
@@ -82,7 +82,6 @@ class UserRegister(HandleAPIView):
         code = request.data.get('code', '')
         user_info = request.data.get('user_info', '')
         return self.register_logic(code, user_info)
-
 
     @staticmethod
     def register_logic(code, user_info: dict):

@@ -1,15 +1,17 @@
 import time
 import uuid
+import os
 import collections
 from urllib.parse import urljoin
 
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from teaching_helper import glog
 from teaching_helper import gdata
 from wx_client.components.authentication import LoginRequire
+from django.conf import settings
 
 import utils
 from utils import DictResponse
@@ -96,7 +98,34 @@ class LoginView(View):
 class UploadFile(View):
 
     def get(self, request, **_):
+        user = request.user
+
         return render(request, 'upload_index.html')
 
     def post(self, request, **_):
         pass
+
+
+class ExitLogin(View):
+    def get(self, request, **_):
+        logout(request)
+        return redirect(settings.LOGIN_URL)
+
+
+class ExamTemplateDownload(View):
+
+    def get(self, request, **_):
+        """下载试卷Excel模板文件"""
+        _ = request
+        try:
+            response = FileResponse(open(gdata.EXAM_TEMPLATE_PATH, 'r'))
+            response['content_type'] = "application/octet-stream"
+            response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(gdata.EXAM_TEMPLATE_PATH)
+            return response
+        except Exception as err:
+            _logger.warning('Failed to download examination: {}'.format(err), exc_info=True)
+            raise Http404
+
+
+
+

@@ -2,9 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/dropzone/5.7.0/min/dropzone.min.css" rel="stylesheet">
+    <link type="image/x-icon" rel="shortcut icon" href="http://134.175.27.71/images/favicon.ico" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dropzone/5.7.0/min/dropzone.min.js"></script>
+    <title>移动教学助手系统网页版-登陆入口</title>
 </head>
-<body>
-通过认证
+<style>
+    #nav {
+        height: 42px;
+        background-color: #0052d9;
+        color: #ffffff;
+        width: 100%;
+        line-height: 42px;
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .row{
+        display: flex;
+        flex-direction: row;
+        margin: 0;
+    }
+    .column{
+        display: flex;
+        flex-direction: column;
+    }
+
+    #user-info{
+        justify-content: center;
+        margin-top: 60px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    #user-info > img{
+        width: 80px;
+        height: 80px;
+        border-radius: 40px;
+        {#border: 1px solid red;#}
+    }
+
+    .opera-line{
+        margin-left: 400px;
+        color: rgba(31, 45, 61, .7);
+    }
+
+    .row-item{
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    label{
+        color: rgba(31, 45, 61, .7);
+    }
+    
+    .item-decro{
+        background-color: #ffbe3d;
+        color: #fff;
+        border-radius: 5px;
+    }
+
+    #func-form{
+        justify-content: center;
+        padding-bottom: 30px;
+        border: none;
+        border-top: 1px solid #0052d9;
+        padding-top: 20px
+    }
+
+    .form-right{
+        width: 365px;
+        height: 500px;
+        overflow-y: scroll;
+        margin-right: 40px;
+        border: 1px solid #0052d9;
+    }
+
+    #footer{
+        text-align: center;
+        background-color: #0052d9;
+        flex: 1;
+        color: #e4e4e4;
+        font-weight: bolder;
+        font-size: 1rem;
+    }
+
+    .confirm-btn{
+        background-color: #0052d9;
+        color: #fff;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    a:hover{
+        border: none!important;
+    }
+
+</style>
+<body class="column" style="margin: 0;height: 100vh;">
+    <!--首页导航栏Nav-->
+    <div id="nav">校园移动教学助手系统网页版欢迎你！<strong>{{ request.user.nickName }}</strong> -></div>
+
+    <!--首页中部用户信息-->
+    <div id="user-info" class="row">
+
+        <img src="{{ request.user.avatarUrl }}" alt="用户头像">
+        <div class="opera-line row">
+            <div id="usage" class="row-item">使用帮助</div>
+            <div id="about-us" class="row-item">关于我们</div>
+            <a href="{% url 'browser:exit' version='v1' %}"><div id="exit" class="row-item item-decro">退出登录</div></a>
+        </div>
+
+    </div>
+
+    <!--功能表单区域-->
+    <div id="func-form" class="row">
+
+        <form action="/file-upload" class="dropzone form-right" id="my-awesome-dropzone">
+{#            <input type="file" name="file" />#}
+        </form>
+
+        <div class="form-left">
+            <div class="column">
+                <label for="resource_type">课堂资源类型</label>
+                <select name="resource_type" class="form-control">
+                  <option>试卷类型</option>
+                  <option>普通资源类型</option>
+                </select>
+
+                <label for="lesson_choice" style="margin-top: 50px">我的班课</label>
+                <select class="form-control" name="lesson_chices">
+                    <option>班课一</option>
+                    <option>班课二</option>
+                </select>
+
+                <a href="{% url 'browser:download_t' version='v1' %}" style="margin-top: 50px;">
+                    <span class="glyphicon glyphicon-download-alt" aria-hidden="false"></span> 试卷模板下载
+                </a>
+
+                <div style="flex: 1;height: auto;"></div>
+
+                <div style="margin-top: 196px;" class="confirm-btn">确认上传</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--底部说明性文字-->
+    <pre id="footer" style="margin: 0;">
+
+
+        注意：
+        1. 目前课堂资源类型的文件支持(*.png、*.jpg、*.gif、*.pdf、*.docx、*.xlsx、*.txt、*.pptx等等)；
+        2. 若教师选择上传试卷资源，需要先下载Excel模板，待完成自组装试卷数据后，即可选择试卷类型并上传。
+    </pre>
+
+    <script type="application/javascript">
+        var myDropzone = new Dropzone("#my-awesome-dropzone", {
+            url: "/upload",
+            dictDefaultMessage: '拖动文件至此或者点击上传', // 设置默认的提示语句
+            paramName: "dropzFile", // 传到后台的参数名称
+            init: function () {
+                this.on("success", function (file, data) {
+                    // 上传成功触发的事件
+                });
+            }
+        });
+    </script>
 </body>
 </html>
