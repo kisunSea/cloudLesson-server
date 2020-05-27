@@ -46,14 +46,14 @@ class BrowserQRLogin(HandleAPIView):
 
         with gdata.LOGIN_QR_CODE_CACHE_LOCK:
             qr_uid = request.data.get('qr_uid')
-
+            _logger.debug('=============cache: {}'.format(gdata.LOGIN_QR_CODE_CACHE))
             login_item = gdata.LOGIN_QR_CODE_CACHE.get(qr_uid, None)
             if login_item is None:
                 return DictResponse(errmsg='二维码已过期, 请刷新页面')
 
             login_item.user_id = request.user.id
             login_item.is_success = True
-            return DictResponse(r=0, data='登陆成功')
+            return DictResponse(r=0, data='登陆成功，请等待页面自动跳转...')
 
 
 class UserRegister(HandleAPIView):
@@ -241,6 +241,7 @@ class LessonView(HandleAPIView):
             teaching_lessons = self.info_serializer(user.teaching_lessons.order_by('-create_time').all(),
                                                     many=True).data
             listening_lessons = self.info_serializer(user.listening_lessons.order_by('-create_time').all(),
+
                                                      many=True).data
         except Exception as e:
             _logger.warn('failed to get information of lessons, error:{}'.format(e), exc_info=True)

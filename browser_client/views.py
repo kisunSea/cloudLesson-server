@@ -57,23 +57,17 @@ class LoginView(View):
         """登录界面
         """
         _ = self
-        LoginQRItem = collections.namedtuple(gdata.LOGIN_QR_CLS_NAME,
-                                             ['effective_time',
-                                              'is_success',
-                                              'user_id',
-                                              'qr_path'])
-
         qr_uid = uuid.uuid4().hex
         qr_generator = utils.QRCodeHelper.qr_code_helper()
         qr_generator.generate_qr_code(qr_uid, path=gdata.LOGIN_QR_CODE_PATH)
         now_timestamp = time.time()
-        qr_url = urljoin(gdata.HTTP_DOMAIN + '/images/qrcode/',
+        qr_url = urljoin(gdata.HTTP_DOMAIN + '/images/loginqr/',
                          '{}.png'.format(qr_uid)) if qr_generator.is_successful else ''
-        login_qr_obj = LoginQRItem(now_timestamp, False, None, qr_url)
+        login_qr_obj = utils.LoginQRItem(now_timestamp, False, None, qr_url)
         with gdata.LOGIN_QR_CODE_CACHE_LOCK:
             gdata.LOGIN_QR_CODE_CACHE[qr_uid] = login_qr_obj
 
-        page_data = {'login_qr_addr': qr_url}
+        page_data = {'login_qr_addr': qr_url, 'auth_key': qr_uid}
         return render(request, 'login_index.html', context=page_data)
 
     def post(self, request, **_):
@@ -85,11 +79,11 @@ class LoginView(View):
 
         login_record = qr_code_cache.get(login_id)
         if not login_record:
-            return DictResponse(errmsg='登录失败')
+            return DictResponse(errmsg='登录失败, 请刷新页面并重新尝试')
 
         login(request, User(id=login_record.user_id))
         del qr_code_cache[login_id]
-        return DictResponse(r=1, data='登陆成功')
+        return render(request, 'upload_index.html')
 
 
 class UploadFile(LoginRequiredView):

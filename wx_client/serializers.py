@@ -142,6 +142,7 @@ class LessonSerializer(serializers.ModelSerializer):
     """
 
     teacher_id = serializers.IntegerField(required=True)
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = models.Lesson

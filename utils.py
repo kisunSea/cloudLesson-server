@@ -115,3 +115,17 @@ class DictResponse(Response):
         ret = dict(r=r, errmsg=errmsg, data=data)
         kwargs['data'] = ret
         super(DictResponse, self).__init__(**kwargs)
+
+
+class LoginQRItem(object):
+    def __init__(self, effective_time, is_success, user_id, qr_path):
+        self.effective_time = effective_time
+        self.is_success = is_success
+        self.user_id = user_id
+        self.qr_path = qr_path
+
+    def __repr__(self):
+        return '<LoginQRItem(effective_time={}, is_success={}, user_id={}, qr_path={})>'.format(self.effective_time,
+                                                                                                self.is_success,
+                                                                                                self.user_id,
+                                                                                                self.qr_path)

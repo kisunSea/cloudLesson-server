@@ -38,4 +38,7 @@ urlpatterns = [
     # POST    publish saying
     # DELETE
     url(r'^saying/$', views.SayView.as_view()),
+
+    # put     scanf qr_code for login on Browser
+    url(r'^browser/operation$', views.BrowserQRLogin.as_view())
 ]

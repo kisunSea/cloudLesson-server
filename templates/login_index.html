@@ -4,13 +4,158 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap-grid.css" rel="stylesheet">
-    <link href="{% static 'css/login.css' %}">
     <link type="image/x-icon" rel="shortcut icon" href="http://134.175.27.71/images/favicon.ico" />
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.js"></script>
     <title>移动教学助手系统网页版-登陆入口</title>
 </head>
-<style></style>
+<style>
+    #back_imgs {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        border: none;
+        width: 100vw;
+        height: 100vh;
+        max-height: none;
+        max-width: none;
+        z-index: -999999;
+        left: 0;
+        overflow: hidden;
+    }
+
+    body{
+        padding: 0!important;
+        margin: 0!important;
+    }
+
+    .row{
+        justify-content: center;
+    }
+
+    #main{
+        position: absolute;
+        width: 780px;
+        margin: 60px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 50%;
+        left: -390px;
+    }
+
+    #main > .main_title{
+        align-items: center;
+    }
+
+    p{
+        text-align: center;
+    }
+
+    .p1{
+        font-size: 38px;
+        font-weight: 700;
+        color: #fff;
+        margin-right: 40px;
+    }
+    .p2{
+        color: #fff;
+        font-weight: 200;
+        font-size: 28px;
+    }
+
+    .description{
+        font-weight: 300;
+        color: #fff;
+        font-size: 16px;
+        opacity: 0.8;
+        margin-top: 30px;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .center{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    #login-form{
+        {#border: 1px solid red;#}
+        background-color: #fff;
+        padding: 30px 20px 15px 20px;
+        margin-left: 40px;
+        border-radius: 6px;
+        margin-bottom: 250px;
+    }
+
+    .row{
+        display: flex;
+        flex-direction: row;
+    }
+
+    .column{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .method_active{
+        color: #0052d9!important;
+        opacity: 0.8;
+        border-bottom: 3px solid #0052d9;
+    }
+
+    .switch-result{
+        margin-top: 30px;
+    }
+
+    .switch-result input{
+        margin-bottom: 15px;
+    }
+
+    .hidden{
+        display: none;
+    }
+    
+    .method_item{
+        color: #555;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .switch-result img{
+        width: 200px;
+        height: 200px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .switch-result > div{
+        height: 200px;
+    }
+
+    #confirm{
+        padding: 8px 15px;
+        width: 150px;
+        text-align: center;
+        background-color: #0052d9;
+        color: #fff;
+        opacity: 0.8;
+        border-radius: 5px;
+        font-size: 15px;
+        letter-spacing: 5px;
+        margin-top: 40px;
+    }
+
+    #m2_display{
+        align-items: center;
+    }
+
+    .switch-result input{
+        height: 34px;
+        padding-left: 20px;
+        border: 1px solid #ccc;
+    }
+</style>
 <body style="margin: 0;">
 
     <!--背景图片层-->
@@ -23,16 +168,32 @@
     <!--主体表单-->
     <div id="main">
         <div class="main_title column">
-            <h2>校园移动教学助手 网页版-登陆入口</h2>
+            <div style="text-align: center;">
+                <span class="p1">校园移动教学助手</span>
+                <span class="p2">网页版-登陆入口</span>
+            </div>
             <div class="description">
                 特别说明：该登陆入口仅限教师角色，用于上传课件、试题库、演示文件等等类型的课堂资源文件，后续版本将支持学生用户登录，并优化改进网页版的功能
             </div>
         </div>
 
         <div class="center">
-            <img src="" alt="扫码登录">
-            <div id="login-form">
-
+            <img src="http://134.175.27.71/images/iphone.png" alt="扫码登录">
+            <div id="login-form" class="column">
+                <div class="row" style="align-items: flex-end;width: 300px;">
+                    <div class="method_item method_active" id="m1_display" style="margin-right: 30px;">扫码登录</div>
+                    <div class="method_item" id="m2_display">账户登录</div>
+                </div>
+                <div class="switch-result">
+                    <div rel="m2_display" class="column hidden" style="align-items: center;">
+                        <input type="text" name="username" placeholder="账户名">
+                        <input type="text" name="password" placeholder="密码">
+                        <div id="confirm" class="hidden">确认登录</div>
+                    </div>
+                    <div rel="m1_display" class="">
+                        <img src="{{ login_qr_addr }}" alt="">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -48,12 +209,46 @@
                 i = i % 2;         // 超过2则取余数，保证循环在0、1、2之间
                 head.attr('src', imgs[i])
             }, 3000);
+
+            // 切换显示【扫码登录】和【账户登录】
+            $(".method_item").click(function () {
+               let id = $(this).attr('id');
+               $(this).siblings('div').removeClass('method_active');
+               $(this).addClass('method_active');
+               if(id == 'm1_display'){  // 点击了【扫码登录】
+                   $("div[rel='m1_display']").removeClass('hidden');
+                   $("div[rel='m2_display']").addClass('hidden');
+                   $('#confirm').addClass('hidden')
+               }else{  // 点击了【账户登录】
+                   $("div[rel='m1_display']").addClass('hidden');
+                   $("div[rel='m2_display']").removeClass('hidden');
+                   $('#confirm').removeClass('hidden')
+               }
+
+            });
         });
     </script>
 
     <!--轮询扫码事件-->
     <script>
+        var interval_post = null;
+        const interval = 2000;
 
+        function handler(){
+            $.post(
+                    '/api/v1/browser_client/login',
+                    {
+                        'random_code': '{{ auth_key }}',
+                    },
+                    function (ret) {  // 成功之后的回调
+                        console.log(ret);
+                    }
+                )
+        }
+
+        $(function () {
+            interval_post = setInterval(handler, interval)
+        })
     </script>
 
     <!--轮询-->
