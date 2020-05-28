@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 import encryption
 import model_access as mc
 import utils
-# from fdfs_storage import fc
+from fdfs_storage import fc
 from teaching_helper import gdata
 from teaching_helper import glog
 from utils import DictResponse
@@ -473,8 +473,8 @@ class FileAPIView(APIView):
         if client_type == 'wx':  # WeChat client
             f_mem = request.data.get('file')
             f_name = '{}.jpg'.format(uuid.uuid4().hex)
-            # fn = fc.save(f_name, f_mem)
-            # return DictResponse(r=0, data={'url': fc.url(fn)})
+            fn = fc.save(f_name, f_mem)
+            return DictResponse(r=0, data={'url': fc.url(fn)})
         else:  # todo browser client  支持多文件上传
             pass
 

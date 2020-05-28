@@ -9,7 +9,8 @@ HTTP_DOMAIN = 'http://134.175.27.71'
 DEFAULT_LESSON_IMG = 'http://134.175.27.71/images/lesson_type_computer.jpg'
 LESSON_QR_CODE_PATH = r'/home/ubuntu/static_files/images/qrcode'
 LOGIN_QR_CODE_PATH = r'/home/ubuntu/static_files/images/loginqr'
-EXAM_TEMPLATE_PATH= r'/home/ubuntu/Downloads/quiz_template.xls'
+EXAM_TEMPLATE_PATH = r'/home/ubuntu/Downloads/quiz_template.xls'
+BASE_RESOURCE_PATH = r'/home/ubuntu/fdfs/storage/avatar_imgs/data'
 
 # WeChat api for registering
 
@@ -132,6 +133,17 @@ RESOURCE_TYPES_CHOICES = (
     (RESOURCE_TYPE_VIDEO, '视频'),
     (RESOURCE_TYPE_OTHER, '其他'),
 )
+
+IMAGES_FILES_SUFFIX = ['jpg', 'gif', 'png', 'jpeg']
+DOCX_FILES_SUFFIX = ['docx', 'txt', 'pptx', 'pdf', 'doc', 'xls']
+AUDIO_FILES_SUFFIX = ['mp3', ]
+VEDIO_FILES_SUFFIX = ['mp4', ]
+
+
+VALID_FILE_SUFFIX = ['jpg', 'gif', 'png', 'jpeg', 'mp3', 'mp4', 'docx', 'txt', 'pptx', 'pdf', 'doc', 'xls']
+EXAM_TYPE = 'exam'
+NORMAL_TYPE = 'normal'
+RESOURCE_TYPES = [EXAM_TYPE, NORMAL_TYPE]
 
 DIFFICULTY_UNKNOWN = 0
 DIFFICULTY_SIMPLE = 1

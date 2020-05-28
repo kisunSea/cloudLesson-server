@@ -91,7 +91,7 @@ class LessonResource(models.Model):
 
     resource_type = models.IntegerField(choices=gdata.RESOURCE_TYPES_CHOICES, default=gdata.RESOURCE_TYPE_OTHER)
     remark = models.CharField(max_length=132, null=True, blank=True)
-    pub_time = models.DateTimeField(auto_created=True)
+    pub_time = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
     lesson = models.ForeignKey(Lesson, related_name='lesson_resources', on_delete=models.PROTECT)
     visibility = models.BooleanField(default=False)
@@ -99,7 +99,6 @@ class LessonResource(models.Model):
     # ext_info 存储规则
     # 文本类型、试卷类型、其他资源类型互斥
     # {
-    #     'text': None
     #     'resource_addr': None,
     #     'examination_id': 1  # 试卷id
     # }
@@ -112,7 +111,7 @@ class Examination(models.Model):
 
     title = models.CharField(max_length=64, null=False, default='')
     lesson = models.ForeignKey(Lesson, related_name='examinations', on_delete=models.PROTECT)
-    create_time = models.DateTimeField(auto_created=True)
+    create_time = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)
 
 
@@ -190,7 +189,7 @@ class SignInTable(models.Model):
     """
 
     lesson = models.ForeignKey(Lesson, related_name='sign_events', on_delete=models.PROTECT)
-    success_time = models.DateTimeField(auto_created=True, verbose_name='签到时间')
+    success_time = models.DateTimeField(auto_now_add=True, verbose_name='签到时间')
     user = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
     distance = models.IntegerField(null=True)
 
@@ -281,5 +280,5 @@ class SayingComment(models.Model):
     Saying = models.ForeignKey(Saying, related_name='saying_comments', on_delete=models.CASCADE)
     root = models.ForeignKey('SayingComment', verbose_name='根评论',
                              related_name='sub_comments', on_delete=models.CASCADE)
-    comment_time = models.DateTimeField(auto_created=True)
+    comment_time = models.DateTimeField(auto_now_add=True)
     is_delete = models.BooleanField(default=False)

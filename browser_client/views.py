@@ -1,20 +1,23 @@
+import os
 import time
 import uuid
-import os
-import collections
+import json
 from urllib.parse import urljoin
 
-from django.views import View
-from django.shortcuts import render, redirect
+from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.http import JsonResponse, FileResponse, Http404
-from teaching_helper import glog
-from teaching_helper import gdata
-from wx_client.components.authentication import LoginRequire
-from django.conf import settings
+from django.shortcuts import render, redirect
+from django.views import View
 
 import utils
-from utils import DictResponse
+import model_access
+from fdfs_storage import fc
+from teaching_helper import gdata
+from teaching_helper import glog
+from wx_client import models as wx_models
+from logic import resource_upload
+from wx_client.components.authentication import LoginRequire
 
 _logger = glog.get_logger(__name__)
 User = get_user_model()
@@ -51,6 +54,7 @@ class LoginView(View):
     1. 该接口所有用户（不校验用户的登录态）均可以访问
     2. 仅处理用户的登录逻辑
     """
+
     #
     # def __init__(self, **kwargs):
     #     super(LoginView, self).__init__(**kwargs)
@@ -76,6 +80,7 @@ class LoginView(View):
     def post(self, request, **_):
         """效验用户是否登陆成功，若成功则跳转界面并将session存储在浏览器.
         """
+        _ = self
         try:
             login_id = request.POST.get('random_code')
             with gdata.LOGIN_QR_CODE_CACHE_LOCK:
@@ -98,16 +103,63 @@ class LoginView(View):
 class UploadFile(View):
 
     def get(self, request, **_):
-        user = request.user
-
-        return render(request, 'upload_index.html')
+        _ = self
+        user = request.user  # type: wx_models.UserProfile
+        return render(request, 'upload_index.html', {
+            'lessons': [
+                {
+                    'lesson_code': t.lesson_code,
+                    'lesson_name': t.lesson_name,
+                    'stu_num': t.stu_num,
+                } for t in user.teaching_lessons.all()]
+        })
 
     def post(self, request, **_):
-        pass
+        action = request.POST.get('action')
+        if not action:
+            f_obj = request.FILES.get('file')
+            file_suffix = f_obj.name.split('.')[-1]
+            if file_suffix not in gdata.VALID_FILE_SUFFIX:
+                return JsonResponse({'file_url': ''})
+            assert file_suffix.lower() in gdata.VALID_FILE_SUFFIX, '无效的文件类型，file name: {}'.format(f_obj.name)
+            _logger.info('get file from browser. file_obj: <{}>'.format(f_obj.name))
+            f_name = '{}.{}'.format(uuid.uuid4().hex, file_suffix)
+            fn = fc.save(f_name, f_obj)
+            return JsonResponse({'file_url': fc.url(fn), 'file_name': f_obj.name})
+
+        else:
+            return self._put(request)
+
+
+    def _put(self, request, **_):
+        """映射文件至数据库操作
+        """
+        try:
+            user = request.user
+            file_array =  request.POST.get('files_array')
+            resource_type = request.POST.get('resource_type')
+            selected_lesson = request.POST.get('selected_lesson')
+
+            _logger.info(
+                'flush file information to DB. user:{}, file_array:{}, resource_type:{}, selected_lesson:{}'.format(
+                    user,
+                    file_array,
+                    resource_type,
+                    selected_lesson))
+            lesson = model_access.QueryLesson.query_lesson_by_lesson_code(selected_lesson)
+            assert resource_type in gdata.RESOURCE_TYPES, '无效的课堂资源类型'
+            assert lesson, '无效的课堂代码，请刷新页面'
+
+            resource_upload.ResourceStorage.flush_resource_2_db(resource_type, json.loads(file_array), lesson)
+            return JsonResponse({'r': 0})
+        except Exception as e:
+            _logger.warning('upload resource error. error: {}'.format(e), exc_info=True)
+            return JsonResponse({'r': 1})
 
 
 class ExitLogin(View):
     def get(self, request, **_):
+        _ = self
         logout(request)
         return redirect(settings.LOGIN_URL)
 
@@ -116,6 +168,7 @@ class ExamTemplateDownload(View):
 
     def get(self, request, **_):
         """下载试卷Excel模板文件"""
+        _ = self
         _ = request
         try:
             response = FileResponse(open(gdata.EXAM_TEMPLATE_PATH, 'r'))
@@ -125,7 +178,3 @@ class ExamTemplateDownload(View):
         except Exception as err:
             _logger.warning('Failed to download examination: {}'.format(err), exc_info=True)
             raise Http404
-
-
-
-

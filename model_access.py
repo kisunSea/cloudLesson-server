@@ -42,3 +42,10 @@ class QuerySayingHelper(object):
     def query_ordered_sayings_by_user(user):
         assert isinstance(user, wx_m.UserProfile)
         return wx_m.Saying.objects.filter(publisher=user).order_by('-pub_time').all()
+
+
+class QueryLesson(object):
+
+    @staticmethod
+    def query_lesson_by_lesson_code(lesson_code):
+        return wx_m.Lesson.objects.filter(lesson_code=lesson_code).first()

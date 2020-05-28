@@ -6,11 +6,37 @@
     <link href="https://cdn.bootcdn.net/ajax/libs/dropzone/5.7.0/min/dropzone.min.css" rel="stylesheet">
     <link type="image/x-icon" rel="shortcut icon" href="http://134.175.27.71/images/favicon.ico" />
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+{#    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>#}
     <script src="https://cdn.bootcdn.net/ajax/libs/dropzone/5.7.0/min/dropzone.min.js"></script>
     <title>移动教学助手系统网页版-登陆入口</title>
 </head>
 <style>
+
+    @font-face {
+      font-family: 'iconfont';  /* project id 903177 */
+      src: url('//at.alicdn.com/t/font_903177_98wfqytm554.eot');
+      src: url('//at.alicdn.com/t/font_903177_98wfqytm554.eot?#iefix') format('embedded-opentype'),
+      url('//at.alicdn.com/t/font_903177_98wfqytm554.woff2') format('woff2'),
+      url('//at.alicdn.com/t/font_903177_98wfqytm554.woff') format('woff'),
+      url('//at.alicdn.com/t/font_903177_98wfqytm554.ttf') format('truetype'),
+      url('//at.alicdn.com/t/font_903177_98wfqytm554.svg#iconfont') format('svg');
+    }
+
+    .icon-download:before{
+        font-family: 'iconfont';
+        content: '\e607';
+    }
+
+    .icon-upload:before{
+        font-family: 'iconfont';
+        content: '\e64a';
+        font-size: 10rem;
+        margin-left: 75px;
+        color: #ddd;
+        top: 60px;
+        position: absolute;
+    }
+
     #nav {
         height: 42px;
         background-color: #0052d9;
@@ -61,7 +87,8 @@
     }
     
     .item-decro{
-        background-color: #ffbe3d;
+        /* background-color: #ffbe3d; */
+        background-color: #0052d9;
         color: #fff;
         border-radius: 5px;
     }
@@ -79,7 +106,11 @@
         height: 500px;
         overflow-y: scroll;
         margin-right: 40px;
-        border: 1px solid #0052d9;
+        border: 1px solid #f1f1f1;
+        background-color: #f9f9f9;
+        font-size: 20px;
+        color: #666;
+        position: relative;
     }
 
     #footer{
@@ -101,9 +132,18 @@
         cursor: pointer;
     }
 
+    .dropzone .dz-preview.dz-image-preview{
+        background-color: #f9f9f9;
+    }
+
     a:hover{
         border: none!important;
     }
+
+    .dropzone .dz-preview .dz-error-message{
+        top: 155px!important;;
+    }
+
 
 </style>
 <body class="column" style="margin: 0;height: 100vh;">
@@ -125,31 +165,30 @@
     <!--功能表单区域-->
     <div id="func-form" class="row">
 
-        <form action="/file-upload" class="dropzone form-right" id="my-awesome-dropzone">
+        <form class="dropzone form-right" id="my-awesome-dropzone">
 {#            <input type="file" name="file" />#}
+            <span id="upload-flag" class="icon-upload"></span>
         </form>
 
         <div class="form-left">
             <div class="column">
                 <label for="resource_type">课堂资源类型</label>
                 <select name="resource_type" class="form-control">
-                  <option>试卷类型</option>
-                  <option>普通资源类型</option>
+                    <option value="normal">普通资源类型</option>
+                    <option value="exam">试卷类型</option>
                 </select>
 
                 <label for="lesson_choice" style="margin-top: 50px">我的班课</label>
                 <select class="form-control" name="lesson_chices">
-                    <option>班课一</option>
-                    <option>班课二</option>
+                    {% for lesson in lessons %}
+                        <option value="{{ lesson.lesson_code }}">{{ lesson.lesson_name }} - {{ lesson.stu_num }}人</option>
+                    {% endfor %}
                 </select>
 
                 <a href="{% url 'browser:download_t' version='v1' %}" style="margin-top: 50px;">
-                    <span class="glyphicon glyphicon-download-alt" aria-hidden="false"></span> 试卷模板下载
+                    <span class="icon-download"></span> 试卷模板下载
                 </a>
-
-                <div style="flex: 1;height: auto;"></div>
-
-                <div style="margin-top: 196px;" class="confirm-btn">确认上传</div>
+                <div style="margin-top: 196px;" class="confirm-btn" id="confirm_1">确认上传</div>
             </div>
         </div>
 
@@ -160,21 +199,114 @@
 
 
         注意：
-        1. 目前课堂资源类型的文件支持(*.png、*.jpg、*.gif、*.pdf、*.docx、*.xlsx、*.txt、*.pptx等等)；
+        1. 目前课堂资源类型的文件支持(.jpg, .gif, .png, .jpeg, .mp3, .mp4, .docx, .txt, .pptx, .pdf等等)；
         2. 若教师选择上传试卷资源，需要先下载Excel模板，待完成自组装试卷数据后，即可选择试卷类型并上传。
     </pre>
 
     <script type="application/javascript">
+        Dropzone.autoDiscover = false;
+        Dropzone.options.myAwesomeDropzone = false;
+        var fileArr = new Array();
         var myDropzone = new Dropzone("#my-awesome-dropzone", {
-            url: "/upload",
-            dictDefaultMessage: '拖动文件至此或者点击上传', // 设置默认的提示语句
-            paramName: "dropzFile", // 传到后台的参数名称
-            init: function () {
-                this.on("success", function (file, data) {
-                    // 上传成功触发的事件
-                });
+                url: "{% url 'browser_client:upload_file' version='v1' %}", // 文件提交地址
+                method: "post",  // 也可用put
+                paramName: "file", // 默认为file
+                maxFiles: 6,// 一次性上传的文件数量上限
+                maxFilesize: 5, // 文件大小，单位：MB
+                acceptedFiles: ".jpg,.gif,.png,.jpeg,.mp3,.mp4,.docx,.txt,.pptx,.pdf,.doc,.xls", // 上传的类型
+                addRemoveLinks: true,
+                parallelUploads: 1,// 一次上传的文件数量
+                //previewsContainer:"#preview", // 上传图片的预览窗口
+                dictDefaultMessage: '拖动文件至此或者点击上传',
+                dictMaxFilesExceeded: "您最多只能上传6个文件！",
+                dictResponseError: '文件上传失败!',
+                dictInvalidFileType: "文件类型只能是.jpg,.gif,.png,.jpeg,.mp3,.mp4,.docx,.txt,.pptx,.pdf",
+                dictFallbackMessage: "浏览器不受支持",
+                dictFileTooBig: "文件过大上传文件最大支持.",
+                dictRemoveFile: "删除",
+                dictCancelUpload: "取消",
+                init: function () {
+                    this.on("addedfile", function (file) {
+                        // 上传文件触发的事件
+                        var resource_type = $("select[name='resource_type']").val();
+                        // console.log(resource_type);
+
+                        // 如果选择【试卷类型】，则仅支持xls文件
+                        if (resource_type == 'exam' && file.name.search('xls') == -1){
+                            alert('试卷类型的课件资源仅支持*.xls文件类型');
+                            this.removeFile(file);
+                        }
+                    });
+                    this.on("success", function (file, data) {
+                        // 上传成功触发的事件
+
+                        // 上传逻辑说明
+                        // 1. 文件上传成功后，会返回【文件可访问路径】、【原生文件名】
+                        fileArr.push(data);
+
+                    });
+                    this.on("error", function (file, data) {
+                        // 上传失败触发的事件
+                        alert(data);
+                        this.removeFile(file);  // 出现错误则从预览容器中移除文件
+                    });
+                    this.on("removedfile", function (file) {
+                        // 删除文件时触发的方法
+                        for (let i = 0; i < fileArr.length; i++) {
+                            if (fileArr[i].file_name == file.name){
+                                fileArr.splice(i, i);
+                            }
+                        }
+                        console.log('删除后fileArr: ', fileArr);
+                    });
+                }
+            });
+
+        $('#confirm_1').click(function () {
+            var resource_type = $("select[name='resource_type']").val();
+            var selected_lesson = $("select[name='lesson_chices']").val();
+
+            // 所选文件
+            var selected_files = "";
+            console.log(fileArr);
+            for (let i = 0; i < fileArr.length; i++) {
+                let row = '' + (i+1) + '. ' + fileArr[i].file_name + '\n';
+                selected_files = selected_files + row;
+            }
+            var r = window.confirm("课堂资源类型: " + $("option[value='" + resource_type+ "']")[0].innerHTML + '\n' +
+                    "所选班课: " + $("option[value='" + selected_lesson + "']")[0].innerHTML + '\n' +
+                    "已选文件如下: " + '\n' +
+                    selected_files);
+
+            if (r==true){
+                // 上传文件数据至服务器
+                if (fileArr.length == 0){
+                    alert('未选择文件，无法完成上传');
+                    return
+                }
+                $.post(
+                    '{% url 'browser:upload_file' version='v1' %}',
+                    {
+                        'action': 1,
+                        'files_array': JSON.stringify(fileArr),
+                        'resource_type': resource_type,
+                        'selected_lesson': selected_lesson,
+                    },
+                    function (ret) {
+                        // console.log(ret);
+                        if (ret.r == 0) {
+                            alert('上传成功！请到小程序端查看资源');
+                            fileArr.length = 0;
+                            myDropzone.RemoveFile();
+                        }else{
+                            alert('上传失败！');
+                        }
+                    }
+                )
             }
         });
+
+
     </script>
 </body>
 </html>
